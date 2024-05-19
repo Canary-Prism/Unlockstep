@@ -34,8 +34,6 @@ public class Lockstep {
     protected static final long barely_range = 135;
     protected static final long hit_range = 70;
 
-    protected static final Color onbeat_color = new Color(0xf84898), offbeat_color = new Color(0xe858a0);
-
     private static final List<CollapsedRhythm> beat_sequence = List.of(
         new Tap(1),
         new Rest(3),
@@ -386,7 +384,7 @@ public class Lockstep {
             return future;
         }
         view = new LockstepView(60, this, sprite_path);
-        view.setBackgroundColor(onbeat_color);
+        view.setBackgroundColor(color_palette.getColor(ColorSequence.onbeat));
         frame.getContentPane().add(view);
 
         setup();
