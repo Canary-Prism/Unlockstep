@@ -24,6 +24,8 @@ import canaryprism.unlockstep.sequence.Rhythm;
 import canaryprism.unlockstep.sequence.Sound;
 import canaryprism.unlockstep.swing.Animation;
 import canaryprism.unlockstep.swing.CollapsedZoomSize;
+import canaryprism.unlockstep.swing.ColorPalette;
+import canaryprism.unlockstep.swing.ColorSequence;
 import canaryprism.unlockstep.swing.LockstepView;
 import canaryprism.unlockstep.swing.ZoomSize;
 
@@ -34,7 +36,7 @@ public class Lockstep {
 
     protected static final Color onbeat_color = new Color(0xf84898), offbeat_color = new Color(0xe858a0);
 
-    protected static final List<CollapsedRhythm> beat_sequence = List.of(
+    private static final List<CollapsedRhythm> beat_sequence = List.of(
         new Tap(1),
         new Rest(3),
         new Tap(1),
@@ -78,7 +80,7 @@ public class Lockstep {
         new On(50)
     );
 
-    protected static final List<CollapsedZoomSize> zoom_sequence = List.of(
+    private static final List<CollapsedZoomSize> zoom_sequence = List.of(
         new CollapsedZoomSize(ZoomSize.l0, 127),
         new CollapsedZoomSize(ZoomSize.l1, 33),
         new CollapsedZoomSize(ZoomSize.l0, 15),
@@ -234,31 +236,31 @@ public class Lockstep {
         return expanded;
     }
 
-    private static List<Color> expandToColor(List<CollapsedRhythm> sequence) {
-        var expanded = new ArrayList<Color>();
+    private static List<ColorSequence> expandToColor(List<CollapsedRhythm> sequence) {
+        var expanded = new ArrayList<ColorSequence>();
         for (int k = 0; k < sequence.size(); k++) {
             var rhythm = sequence.get(k);
             if (rhythm instanceof On r) {
                 if (expanded.size() > 0 && sequence.get(k - 1) instanceof Off) {
                     var size = expanded.size();
-                    expanded.set(size - 1, offbeat_color);
-                    expanded.set(size - 2, onbeat_color);
-                    expanded.set(size - 3, offbeat_color);
-                    expanded.set(size - 4, onbeat_color);
+                    expanded.set(size - 1, ColorSequence.offbeat);
+                    expanded.set(size - 2, ColorSequence.onbeat);
+                    expanded.set(size - 3, ColorSequence.offbeat);
+                    expanded.set(size - 4, ColorSequence.onbeat);
                 }
-                expanded.add(onbeat_color);
+                expanded.add(ColorSequence.onbeat);
                 for (int i = 1; i < r.beats(); i++) {
                     expanded.add(null);
                 }
             } else if (rhythm instanceof Off r) {
                 if (expanded.size() > 0 && sequence.get(k - 1) instanceof On) {
                     var size = expanded.size();
-                    expanded.set(size - 1, onbeat_color);
-                    expanded.set(size - 3, offbeat_color);
-                    expanded.set(size - 5, onbeat_color);
-                    expanded.set(size - 7, offbeat_color);
+                    expanded.set(size - 1, ColorSequence.onbeat);
+                    expanded.set(size - 3, ColorSequence.offbeat);
+                    expanded.set(size - 5, ColorSequence.onbeat);
+                    expanded.set(size - 7, ColorSequence.onbeat);
                 }
-                expanded.add(offbeat_color);
+                expanded.add(ColorSequence.offbeat);
                 for (int i = 1; i < r.beats(); i++) {
                     expanded.add(null);
                 }
@@ -286,12 +288,40 @@ public class Lockstep {
         return expanded;
     }
 
-    protected static final List<Rhythm> rhythm_sequence = expandToRhythm(beat_sequence);
-    protected static final List<Sound> sound_sequence = expandToSound(beat_sequence);
-    protected static final List<Animation> animation_sequence = expandToAnimations(beat_sequence);
-    protected static final List<Color> color_sequence = expandToColor(beat_sequence);
+    protected static final List<Rhythm> lockstep1_rhythm_sequence = expandToRhythm(beat_sequence);
+    protected static final List<Sound> lockstep1_sound_sequence = expandToSound(beat_sequence);
+    protected static final List<Animation> lockstep1_animation_sequence = expandToAnimations(beat_sequence);
+    protected static final List<ColorSequence> lockstep1_color_sequence = expandToColor(beat_sequence);
 
-    protected static final List<ZoomSize> size_sequence = expandToSize(zoom_sequence);
+    protected static final List<ZoomSize> lockstep1_size_sequence = expandToSize(zoom_sequence);
+
+    
+    protected List<Rhythm> getRhythmSequence() {
+        return lockstep1_rhythm_sequence;
+    }
+    
+    protected List<Sound> getSoundSequence() {
+        return lockstep1_sound_sequence;
+    }
+    
+    protected List<Animation> getAnimationSequence() {
+        return lockstep1_animation_sequence;
+    }
+    
+    protected List<ColorSequence> getColorSequence() {
+        return lockstep1_color_sequence;
+    }
+    
+    protected List<ZoomSize> getSizeSequence() {
+        return lockstep1_size_sequence;
+    }
+
+    protected final List<Rhythm> rhythm_sequence = getRhythmSequence();
+    protected final List<Sound> sound_sequence = getSoundSequence();
+    protected final List<Animation> animation_sequence = getAnimationSequence();
+    protected final List<ColorSequence> color_sequence = getColorSequence();
+
+    protected final List<ZoomSize> size_sequence = getSizeSequence();
 
 
     protected long getConductorBpm() {
@@ -305,13 +335,15 @@ public class Lockstep {
     protected final Conductor conductor = new Conductor(60_000, getConductorBpm());
     private final String sprite_path;
     private final JFrame frame;
+    private final ColorPalette color_palette;
 
     private final PlayerInputHandler input_handler;
 
     private final Clip music;
 
-    public Lockstep(JFrame frame, String music_path, String sound_path, String sprite_path) {
+    public Lockstep(JFrame frame, String music_path, String sound_path, String sprite_path, ColorPalette color_palette) {
         this.sprite_path = sprite_path;
+        this.color_palette = color_palette;
 
         this.frame = frame;
 
@@ -425,7 +457,7 @@ public class Lockstep {
             }
 
             if (color_sequence.get(i) != null) {
-                view.setBackgroundColor(color_sequence.get(i));
+                view.setBackgroundColor(color_palette.getColor(color_sequence.get(i)));
             }
         });
         conductor.submit((e) -> {
