@@ -6,7 +6,8 @@ to use:
 ```sh
 java -jar --enable-preview <the file>
 ```
-you can optionally specify `--game`, `--music`, `--sprite`, and `--color` to be either `lockstep1` or `lockstep2`  
+you can optionally specify `--game`, `--music`, `--sprite`, `--color`, and `--intro` to be either `lockstep1` or `lockstep2`  
+`--intro` can also be `skip` to skip the intro
 if you only specify some of them the rest will be determined by which makes most sense
 
 ### [Download](https://github.com/Canary-Prism/Unlockstep/releases/)
@@ -30,6 +31,12 @@ This program uses Java 22 with preview features bc i'm weird like that
 
 
 ## Historical Changelog
+
+### 2.1.0
+- fade in and fade out of game
+- you can't accidentally misinput after the end anymore
+- closing the frame stops the program
+- intro title card added
 
 ### 2.0.1
 - you now don't get hit twice in a row if you miss again
