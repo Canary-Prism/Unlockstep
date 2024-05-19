@@ -293,7 +293,16 @@ public class Lockstep {
 
     private static final List<ZoomSize> size_sequence = expandToSize(zoom_sequence);
 
-    private final Conductor conductor = new Conductor(60_000, 162 * 2);
+
+    protected long getConductorBpm() {
+        return 162 * 2;
+    }
+
+    protected long getInitialDelay() {
+        return 1500 * 60 / 162;
+    }
+
+    private final Conductor conductor = new Conductor(60_000, getConductorBpm());
     private final String assets_path;
     private final JFrame frame;
 
@@ -304,9 +313,9 @@ public class Lockstep {
     public Lockstep(String assets_path) {
         this.assets_path = assets_path;
 
-        frame = new JFrame();
+        frame = new JFrame(this.getClass().getSimpleName());
 
-        this.input_handler = new PlayerInputHandler(this, animation_sequence, barely_range, hit_range);
+        this.input_handler = new PlayerInputHandler(this, 60_000, getConductorBpm(), animation_sequence, barely_range, hit_range);
 
         try {
             this.music = AudioSystem.getClip();
@@ -413,10 +422,11 @@ public class Lockstep {
                 view.zoom(size_sequence.get(i));
         });
 
+        var initial_delay = getInitialDelay();
 
         music.start();
-        conductor.start(1500 * 60 / 162);
-        input_handler.start(1500 * 60 / 162);
+        conductor.start(initial_delay);
+        input_handler.start(initial_delay);
 
         frame.setSize(200 * 3, 256 * 3);
         frame.setVisible(true);

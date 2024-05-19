@@ -15,13 +15,13 @@ public class PlayerInputHandler {
 
     private final Lockstep lockstep;
 
-    public PlayerInputHandler(Lockstep lockstep, List<Animation> animation_sequence, long barely_range, long hit_range) {
+    public PlayerInputHandler(Lockstep lockstep, long millis, long beats, List<Animation> animation_sequence, long barely_range, long hit_range) {
         this.lockstep = lockstep;
 
-        this.start_barely_conductor = new Conductor(60_000, 162 * 2);
-        this.start_hit_conductor = new Conductor(60_000, 162 * 2);
-        this.end_hit_conductor = new Conductor(60_000, 162 * 2);
-        this.end_barely_conductor = new Conductor(60_000, 162 * 2);
+        this.start_barely_conductor = new Conductor(millis, beats);
+        this.start_hit_conductor = new Conductor(millis, beats);
+        this.end_hit_conductor = new Conductor(millis, beats);
+        this.end_barely_conductor = new Conductor(millis, beats);
 
         start_barely_conductor.submit((e) -> {
             int i = e.beat();
