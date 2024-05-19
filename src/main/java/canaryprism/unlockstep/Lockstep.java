@@ -310,10 +310,10 @@ public class Lockstep {
 
     private final Clip music;
 
-    public Lockstep(String assets_path) {
+    public Lockstep(JFrame frame, String assets_path) {
         this.assets_path = assets_path;
 
-        frame = new JFrame(this.getClass().getSimpleName());
+        this.frame = frame;
 
         this.input_handler = new PlayerInputHandler(this, 60_000, getConductorBpm(), animation_sequence, barely_range, hit_range);
 
