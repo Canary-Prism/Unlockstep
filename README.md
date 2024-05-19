@@ -31,6 +31,9 @@ This program uses Java 22 with preview features bc i'm weird like that
 
 ## Historical Changelog
 
+### 2.0.1
+- you now don't get hit twice in a row if you miss again
+
 ### 2.0.0
 - added Lockstep 2
 - added Main arguments 

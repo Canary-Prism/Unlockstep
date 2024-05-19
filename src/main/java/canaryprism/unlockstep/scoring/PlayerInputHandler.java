@@ -157,6 +157,7 @@ public class PlayerInputHandler {
                 }
                 case miss -> {
                     missHit();
+                    has_missed = true;
                 }
             }
         }
