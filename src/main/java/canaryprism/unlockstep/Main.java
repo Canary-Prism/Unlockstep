@@ -24,7 +24,7 @@ public class Main {
         return getArg(args, key, () -> { throw new IllegalArgumentException("No value for key " + key); });
     }
     static <T> T getArg(String[] args, String key, Function<String, T> parser, Supplier<T> default_value) {
-        for (int i = args.length - 1; i >= 0; i--) {
+        for (int i = args.length - 2; i >= 0; i--) {
             if (args[i].equals(key)) {
                 return parser.apply(args[i + 1]);
             }
