@@ -357,6 +357,24 @@ public class Lockstep {
         view.setBackgroundColor(onbeat_color);
         frame.getContentPane().add(view);
 
+        setup();
+
+        var initial_delay = getInitialDelay();
+
+        music.start();
+        conductor.start(initial_delay);
+        input_handler.start(initial_delay);
+
+        frame.setSize(200 * 3, 256 * 3);
+        frame.setVisible(true);
+
+        view.allAnimate(Animation.readytap);
+
+        this.future = new CompletableFuture<>();
+        return this.future;
+    }
+
+    private void setup() {
         conductor.submit((e) -> {
             int i = e.beat();
 
@@ -421,20 +439,6 @@ public class Lockstep {
             if (size_sequence.get(i) != null)
                 view.zoom(size_sequence.get(i));
         });
-
-        var initial_delay = getInitialDelay();
-
-        music.start();
-        conductor.start(initial_delay);
-        input_handler.start(initial_delay);
-
-        frame.setSize(200 * 3, 256 * 3);
-        frame.setVisible(true);
-
-        view.allAnimate(Animation.readytap);
-
-        this.future = new CompletableFuture<>();
-        return this.future;
     }
 
     public void stop() {
