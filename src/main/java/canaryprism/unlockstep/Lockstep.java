@@ -303,15 +303,15 @@ public class Lockstep {
     }
 
     private final Conductor conductor = new Conductor(60_000, getConductorBpm());
-    private final String assets_path;
+    private final String sprite_path;
     private final JFrame frame;
 
     private final PlayerInputHandler input_handler;
 
     private final Clip music;
 
-    public Lockstep(JFrame frame, String assets_path) {
-        this.assets_path = assets_path;
+    public Lockstep(JFrame frame, String music_path, String sound_path, String sprite_path) {
+        this.sprite_path = sprite_path;
 
         this.frame = frame;
 
@@ -319,18 +319,18 @@ public class Lockstep {
 
         try {
             this.music = AudioSystem.getClip();
-            music.open(AudioSystem.getAudioInputStream(getResource(STR."\{assets_path}/audio/music/lockstep.wav")));
+            music.open(AudioSystem.getAudioInputStream(getResource(music_path)));
         } catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {
             throw new RuntimeException(e);
         }
 
 
         for (var sound : Sound.values()) {
-            sounds.put(sound, new AudioPlayer(getResource(STR."\{assets_path}/audio/sfx/\{sound.name()}.wav"), 2));
+            sounds.put(sound, new AudioPlayer(getResource(STR."\{sound_path}/sfx/\{sound.name()}.wav"), 2));
         }
 
         for (var sound : PlayerSound.values()) {
-            player_sounds.put(sound, new AudioPlayer(getResource(STR."\{assets_path}/audio/sfx/player/\{sound.name()}.wav"), 10));
+            player_sounds.put(sound, new AudioPlayer(getResource(STR."\{sound_path}/player/\{sound.name()}.wav"), 10));
         }
 
         player_sounds.get(PlayerSound.onbeat).setVolume(.7f);
@@ -353,7 +353,7 @@ public class Lockstep {
         if (view != null) {
             return future;
         }
-        view = new LockstepView(60, this, assets_path);
+        view = new LockstepView(60, this, sprite_path);
         view.setBackgroundColor(onbeat_color);
         frame.getContentPane().add(view);
 

@@ -20,18 +20,18 @@ public class LockstepView extends JComponent {
 
     private final Image bach_formation_left, bach_formation_right;
         
-    public LockstepView(int fps, Lockstep lockstep, String assets_path) {
+    public LockstepView(int fps, Lockstep lockstep, String sprite_path) {
 
         this.sprite_sets = new HashMap<>();
-        sprite_sets.put(ZoomSize.l0, new StepswitcherSpriteSet(ZoomSize.l0, assets_path + "/sprites/stepswitcher-0"));
-        sprite_sets.put(ZoomSize.l1, new StepswitcherSpriteSet(ZoomSize.l1, assets_path + "/sprites/stepswitcher-1"));
-        sprite_sets.put(ZoomSize.l2, new StepswitcherSpriteSet(ZoomSize.l2, assets_path + "/sprites/stepswitcher-2"));
-        sprite_sets.put(ZoomSize.l3, new StepswitcherSpriteSet(ZoomSize.l3, assets_path + "/sprites/stepswitcher-3"));
-        sprite_sets.put(ZoomSize.l4, new StepswitcherSpriteSet(ZoomSize.l4, assets_path + "/sprites/stepswitcher-4"));
+        sprite_sets.put(ZoomSize.l0, new StepswitcherSpriteSet(ZoomSize.l0, sprite_path + "/stepswitcher-0"));
+        sprite_sets.put(ZoomSize.l1, new StepswitcherSpriteSet(ZoomSize.l1, sprite_path + "/stepswitcher-1"));
+        sprite_sets.put(ZoomSize.l2, new StepswitcherSpriteSet(ZoomSize.l2, sprite_path + "/stepswitcher-2"));
+        sprite_sets.put(ZoomSize.l3, new StepswitcherSpriteSet(ZoomSize.l3, sprite_path + "/stepswitcher-3"));
+        sprite_sets.put(ZoomSize.l4, new StepswitcherSpriteSet(ZoomSize.l4, sprite_path + "/stepswitcher-4"));
 
         try {
-            this.bach_formation_left = ImageIO.read(Lockstep.getResource(assets_path + "/sprites/bach_formation_left.png"));
-            this.bach_formation_right = ImageIO.read(Lockstep.getResource(assets_path + "/sprites/bach_formation_right.png"));
+            this.bach_formation_left = ImageIO.read(Lockstep.getResource(sprite_path + "/sprites/bach_formation_left.png"));
+            this.bach_formation_right = ImageIO.read(Lockstep.getResource(sprite_path + "/sprites/bach_formation_right.png"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
