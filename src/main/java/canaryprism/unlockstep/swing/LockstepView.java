@@ -30,8 +30,8 @@ public class LockstepView extends JComponent {
         sprite_sets.put(ZoomSize.l4, new StepswitcherSpriteSet(ZoomSize.l4, sprite_path + "/stepswitcher-4"));
 
         try {
-            this.bach_formation_left = ImageIO.read(Lockstep.getResource(sprite_path + "/sprites/bach_formation_left.png"));
-            this.bach_formation_right = ImageIO.read(Lockstep.getResource(sprite_path + "/sprites/bach_formation_right.png"));
+            this.bach_formation_left = ImageIO.read(Lockstep.getResource(sprite_path + "/bach_formation_left.png"));
+            this.bach_formation_right = ImageIO.read(Lockstep.getResource(sprite_path + "/bach_formation_right.png"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
