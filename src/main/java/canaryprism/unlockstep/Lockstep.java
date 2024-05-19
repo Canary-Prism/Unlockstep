@@ -374,7 +374,7 @@ public class Lockstep {
         return this.future;
     }
 
-    private void setup() {
+    protected void setup() {
         conductor.submit((e) -> {
             int i = e.beat();
 
