@@ -1,6 +1,5 @@
 package canaryprism.unlockstep;
 
-import java.awt.Color;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
