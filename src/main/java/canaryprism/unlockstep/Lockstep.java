@@ -29,12 +29,12 @@ import canaryprism.unlockstep.swing.ZoomSize;
 
 public class Lockstep {
 
-    private static final long barely_range = 135;
-    private static final long hit_range = 70;
+    protected static final long barely_range = 135;
+    protected static final long hit_range = 70;
 
-    private static final Color onbeat_color = new Color(0xf84898), offbeat_color = new Color(0xe858a0);
+    protected static final Color onbeat_color = new Color(0xf84898), offbeat_color = new Color(0xe858a0);
 
-    private static final List<CollapsedRhythm> beat_sequence = List.of(
+    protected static final List<CollapsedRhythm> beat_sequence = List.of(
         new Tap(1),
         new Rest(3),
         new Tap(1),
@@ -78,7 +78,7 @@ public class Lockstep {
         new On(50)
     );
 
-    private static final List<CollapsedZoomSize> zoom_sequence = List.of(
+    protected static final List<CollapsedZoomSize> zoom_sequence = List.of(
         new CollapsedZoomSize(ZoomSize.l0, 127),
         new CollapsedZoomSize(ZoomSize.l1, 33),
         new CollapsedZoomSize(ZoomSize.l0, 15),
@@ -286,12 +286,12 @@ public class Lockstep {
         return expanded;
     }
 
-    private static final List<Rhythm> rhythm_sequence = expandToRhythm(beat_sequence);
-    private static final List<Sound> sound_sequence = expandToSound(beat_sequence);
-    private static final List<Animation> animation_sequence = expandToAnimations(beat_sequence);
-    private static final List<Color> color_sequence = expandToColor(beat_sequence);
+    protected static final List<Rhythm> rhythm_sequence = expandToRhythm(beat_sequence);
+    protected static final List<Sound> sound_sequence = expandToSound(beat_sequence);
+    protected static final List<Animation> animation_sequence = expandToAnimations(beat_sequence);
+    protected static final List<Color> color_sequence = expandToColor(beat_sequence);
 
-    private static final List<ZoomSize> size_sequence = expandToSize(zoom_sequence);
+    protected static final List<ZoomSize> size_sequence = expandToSize(zoom_sequence);
 
 
     protected long getConductorBpm() {
@@ -302,7 +302,7 @@ public class Lockstep {
         return 1500 * 60 / 162;
     }
 
-    private final Conductor conductor = new Conductor(60_000, getConductorBpm());
+    protected final Conductor conductor = new Conductor(60_000, getConductorBpm());
     private final String sprite_path;
     private final JFrame frame;
 
