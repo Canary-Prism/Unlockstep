@@ -319,7 +319,7 @@ public class Lockstep {
 
         try {
             this.music = AudioSystem.getClip();
-            music.open(AudioSystem.getAudioInputStream(getResource(STR."\{assets_path}/audio/music/lockstep1.wav")));
+            music.open(AudioSystem.getAudioInputStream(getResource(STR."\{assets_path}/audio/music/lockstep.wav")));
         } catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {
             throw new RuntimeException(e);
         }
