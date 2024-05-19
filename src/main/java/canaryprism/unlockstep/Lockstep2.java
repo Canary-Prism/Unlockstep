@@ -355,6 +355,9 @@ public class Lockstep2 extends Lockstep {
                     player_sounds.get(PlayerSound.offbeat).play();
                 }
             }
+            if (i + 6 == rhythm_sequence.size()) {
+                view.fadeOut();
+            }
         });
         conductor.submit((e) -> {
             int i = e.beat();
