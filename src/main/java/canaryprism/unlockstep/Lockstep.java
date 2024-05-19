@@ -333,13 +333,13 @@ public class Lockstep {
     protected final Conductor conductor = new Conductor(60_000, getConductorBpm());
     private final String sprite_path;
     private final JFrame frame;
-    private final ColorPalette color_palette;
+    protected final ColorPalette color_palette;
 
     private final PlayerInputHandler input_handler;
 
     private final Clip music;
 
-    public Lockstep(JFrame frame, String music_path, String sound_path, String sprite_path, ColorPalette color_palette) {
+    public Lockstep(JFrame frame, String music_path, String audio_path, String sprite_path, ColorPalette color_palette) {
         this.sprite_path = sprite_path;
         this.color_palette = color_palette;
 
@@ -356,11 +356,11 @@ public class Lockstep {
 
 
         for (var sound : Sound.values()) {
-            sounds.put(sound, new AudioPlayer(getResource(STR."\{sound_path}/sfx/\{sound.name()}.wav"), 2));
+            sounds.put(sound, new AudioPlayer(getResource(STR."\{audio_path}/sfx/\{sound.name()}.wav"), 2));
         }
 
         for (var sound : PlayerSound.values()) {
-            player_sounds.put(sound, new AudioPlayer(getResource(STR."\{sound_path}/player/\{sound.name()}.wav"), 10));
+            player_sounds.put(sound, new AudioPlayer(getResource(STR."\{audio_path}/player/\{sound.name()}.wav"), 10));
         }
 
         player_sounds.get(PlayerSound.onbeat).setVolume(.7f);
@@ -372,10 +372,10 @@ public class Lockstep {
         });
     }
 
-    private final HashMap<Sound, AudioPlayer> sounds = new HashMap<>();
-    private final HashMap<PlayerSound, AudioPlayer> player_sounds = new HashMap<>();
+    protected final HashMap<Sound, AudioPlayer> sounds = new HashMap<>();
+    protected final HashMap<PlayerSound, AudioPlayer> player_sounds = new HashMap<>();
 
-    private volatile LockstepView view = null;
+    protected volatile LockstepView view = null;
 
     private volatile CompletableFuture<Void> future = null;
 
