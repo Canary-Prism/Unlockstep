@@ -5,13 +5,12 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
-import java.awt.Color;
-
 import canaryprism.unlockstep.sequence.CollapsedRhythm;
 import canaryprism.unlockstep.sequence.CollapsedRhythm.Off;
 import canaryprism.unlockstep.sequence.CollapsedRhythm.On;
 import canaryprism.unlockstep.sequence.CollapsedRhythm.Rest;
 import canaryprism.unlockstep.sequence.CollapsedRhythm.Tap;
+import canaryprism.unlockstep.sequence.PlayerSound;
 import canaryprism.unlockstep.sequence.Rhythm;
 import canaryprism.unlockstep.sequence.Sound;
 import canaryprism.unlockstep.swing.Animation;
@@ -44,9 +43,9 @@ public class Lockstep2 extends Lockstep {
         new Tap(1),
         new Rest(2),
         new On(47),
-        new Off(48),
+        new Off(49),
         new On(47),
-        new Off(48),
+        new Off(49),
         new On(23),
         new Off(25),
         new On(23),
@@ -62,23 +61,23 @@ public class Lockstep2 extends Lockstep {
         new On(29),
         new Off(19),
         new On(53),
-        new Off(50),
+        new Off(49),
         new On(75)
     );
 
     private static final List<CollapsedZoomSize> zoom_sequence = List.of(
         new CollapsedZoomSize(ZoomSize.l0, 191),
-        new CollapsedZoomSize(ZoomSize.l1, 50),
+        new CollapsedZoomSize(ZoomSize.l1, 49),
         new CollapsedZoomSize(ZoomSize.l0, 23),
-        new CollapsedZoomSize(ZoomSize.l1, 26),
+        new CollapsedZoomSize(ZoomSize.l1, 25),
         new CollapsedZoomSize(ZoomSize.l2, 23),
-        new CollapsedZoomSize(ZoomSize.l1, 26),
+        new CollapsedZoomSize(ZoomSize.l1, 25),
         new CollapsedZoomSize(ZoomSize.l0, 11),
         new CollapsedZoomSize(ZoomSize.l1, 13),
         new CollapsedZoomSize(ZoomSize.l2, 11),
         new CollapsedZoomSize(ZoomSize.l3, 13),
         new CollapsedZoomSize(ZoomSize.l4, 11),
-        new CollapsedZoomSize(ZoomSize.l3, 26),
+        new CollapsedZoomSize(ZoomSize.l3, 25),
         new CollapsedZoomSize(ZoomSize.l2, 2),
         new CollapsedZoomSize(ZoomSize.l1, 2),
         new CollapsedZoomSize(ZoomSize.l0, 2),
@@ -86,9 +85,9 @@ public class Lockstep2 extends Lockstep {
         new CollapsedZoomSize(ZoomSize.l1, 2),
         new CollapsedZoomSize(ZoomSize.l0, 2),
         new CollapsedZoomSize(ZoomSize.l3, 23),
-        new CollapsedZoomSize(ZoomSize.l4, 13),
-        new CollapsedZoomSize(ZoomSize.l0, 19),
-        new CollapsedZoomSize(ZoomSize.l3, 29),
+        new CollapsedZoomSize(ZoomSize.l4, 19),
+        new CollapsedZoomSize(ZoomSize.l0, 6),
+        new CollapsedZoomSize(ZoomSize.l3, 23),
         new CollapsedZoomSize(ZoomSize.l4, 19),
         new CollapsedZoomSize(ZoomSize.l0, 6),
         new CollapsedZoomSize(ZoomSize.l1, 3),
@@ -106,7 +105,7 @@ public class Lockstep2 extends Lockstep {
         new CollapsedZoomSize(ZoomSize.l1, 3),
         new CollapsedZoomSize(ZoomSize.l2, 3),
         new CollapsedZoomSize(ZoomSize.l3, 3),
-        new CollapsedZoomSize(ZoomSize.l4, 14 + 75)
+        new CollapsedZoomSize(ZoomSize.l4, 13 + 75)
     );
 
     private static List<Rhythm> expandToRhythm(List<CollapsedRhythm> sequence) {
@@ -168,7 +167,7 @@ public class Lockstep2 extends Lockstep {
                 for (int i = 1; i < r.beats(); i++) {
                     expanded.add(null);
                 }
-                for (int i = 2; i <= 15; i += 3) {
+                for (int i = 2; i <= 11; i += 3) {
                     expanded.set(size + i, Sound.ho);
                 }
             } else if (rhythm instanceof Rest r) {
@@ -184,37 +183,43 @@ public class Lockstep2 extends Lockstep {
         return expanded;
     }
 
+    private static int modinc(int i, int n) {
+        if (i + 1 >= n)
+            return 0;
+        return i + 1;
+    }
+
     private static List<Animation> expandToAnimations(List<CollapsedRhythm> sequence) {
         var expanded = new ArrayList<Animation>();
-        boolean onbeat = true;
+        int beat = 0;
         for (int k = 0; k < sequence.size(); k++) {
             var rhythm = sequence.get(k);
 
             if (rhythm instanceof On r) {
                 for (int i = 0; i < r.beats(); i++) {
-                    if (onbeat)
+                    if (beat == 0)
                         expanded.add(Animation.hitleft);
                     else
                         expanded.add(null);
-                    onbeat = !onbeat;
+                    beat = modinc(beat, 3);
                 }
             } else if (rhythm instanceof Off r) {
                 for (int i = 0; i < r.beats(); i++) {
-                    if (!onbeat)
+                    if (beat == 2)
                         expanded.add(Animation.hitright);
                     else
                         expanded.add(null);
-                    onbeat = !onbeat;
+                    beat = modinc(beat, 3);
                 }
             } else if (rhythm instanceof Rest r) {
                 for (int i = 0; i < r.beats(); i++) {
                     expanded.add(null);
-                    onbeat = !onbeat;
+                    beat = modinc(beat, 3);
                 }
             } else if (rhythm instanceof Tap r) {
                 for (int i = 0; i < r.beats(); i++) {
                     expanded.add(Animation.tap);
-                    onbeat = !onbeat;
+                    beat = modinc(beat, 3);
                 }
             }
         }
@@ -315,6 +320,80 @@ public class Lockstep2 extends Lockstep {
     @Override
     protected long getConductorBpm() {
         return 135 * 3;
+    }
+
+    @Override
+    protected long getInitialDelay() {
+        return 600 * 60 / 135;
+    }
+
+    @Override
+    protected void setup() {
+        conductor.submit((e) -> {
+            int i = e.beat();
+
+            if (i >= sound_sequence.size()) {
+                conductor.stop();
+            }
+            if (sound_sequence.get(i) != null)
+                sounds.get(sound_sequence.get(i)).play();
+        });
+        conductor.submit((e) -> {
+            int i = e.beat();
+            var on = (i % 3) == 0;
+            var off = (i % 3) == 2;
+            if (i >= rhythm_sequence.size()) {
+                conductor.stop();
+                return;
+            }
+            if (rhythm_sequence.get(i) == Rhythm.on) {
+                if (on) {
+                    player_sounds.get(PlayerSound.onbeat).play();
+                }
+            } else if (rhythm_sequence.get(i) == Rhythm.off) {
+                if (off) {
+                    player_sounds.get(PlayerSound.offbeat).play();
+                }
+            }
+        });
+        conductor.submit((e) -> {
+            int i = e.beat();
+
+            if (i >= animation_sequence.size()) {
+                conductor.stop();
+                return;
+            }
+
+            if (animation_sequence.get(i) != null) {
+                if (animation_sequence.get(i) == Animation.tap)
+                    view.allAnimate(Animation.tap);
+                else
+                    view.crowdAnimate(animation_sequence.get(i));
+            }
+        });
+        conductor.submit((e) -> {
+            int i = e.beat();
+
+            if (i >= color_sequence.size()) {
+                conductor.stop();
+                return;
+            }
+
+            if (color_sequence.get(i) != null) {
+                view.setBackgroundColor(color_palette.getColor(color_sequence.get(i)));
+            }
+        });
+        conductor.submit((e) -> {
+            int i = e.beat();
+
+            if (i >= size_sequence.size()) {
+                conductor.stop();
+                return;
+            }
+
+            if (size_sequence.get(i) != null)
+                view.zoom(size_sequence.get(i));
+        });
     }
     
 }
