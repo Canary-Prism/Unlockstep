@@ -32,6 +32,9 @@ This program uses Java 22 with preview features bc i'm weird like that
 
 ## Historical Changelog
 
+### 2.1.1
+- fixed bug now Lockstep 2 also fades to black at the end
+
 ### 2.1.0
 - fade in and fade out of game
 - you can't accidentally misinput after the end anymore
