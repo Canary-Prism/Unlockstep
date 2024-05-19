@@ -97,6 +97,10 @@ public class PlayerInputHandler {
                     };
                 }
                 has_tapped = false;
+
+                if (i + 1 >= animation_sequence.size()) {
+                    this.running = false;
+                }
             }
         });
 
@@ -116,6 +120,8 @@ public class PlayerInputHandler {
 
     private volatile Animation last_animation;
 
+    private volatile boolean running = false;
+
     private void missHit() {
         synchronized (ticklock) {
             lockstep.animatePlayer(player_animation);
@@ -129,9 +135,13 @@ public class PlayerInputHandler {
         start_hit_conductor.start(initial_delay - hit_start);
         end_hit_conductor.start(initial_delay + hit_end);
         end_barely_conductor.start(initial_delay + barely_end);
+        running = true;
     }
 
     public void playerInput() {
+        if (!running) {
+            return;
+        }
         synchronized (ticklock) {
             var score = this.current_score;
             if (has_tapped) 

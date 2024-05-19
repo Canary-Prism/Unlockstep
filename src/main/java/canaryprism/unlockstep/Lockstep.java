@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.CompletableFuture;
 
 import javax.sound.sampled.AudioSystem;
@@ -390,14 +392,30 @@ public class Lockstep {
 
         var initial_delay = getInitialDelay();
 
-        music.start();
-        conductor.start(initial_delay);
-        input_handler.start(initial_delay);
+        var timer = new Timer();
+
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                view.allAnimate(Animation.readytap);
+            }
+        }, 1000);
+
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                music.start();
+                conductor.start(initial_delay);
+                input_handler.start(initial_delay);
+            }
+        }, 1500);
+
 
         frame.setSize(200 * 3, 256 * 3);
         frame.setVisible(true);
 
-        view.allAnimate(Animation.readytap);
+        view.fadeIn();
+
 
         this.future = new CompletableFuture<>();
         return this.future;
@@ -428,6 +446,9 @@ public class Lockstep {
                 if (!on) {
                     player_sounds.get(PlayerSound.offbeat).play();
                 }
+            }
+            if (i + 4 == rhythm_sequence.size()) {
+                view.fadeOut();
             }
         });
         conductor.submit((e) -> {

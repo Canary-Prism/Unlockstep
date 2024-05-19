@@ -6,6 +6,7 @@ import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -113,6 +114,10 @@ public class LockstepView extends JComponent {
     private volatile List<StepswitcherPose> player_animation;
     private volatile int player_animation_frame;
 
+    private volatile List<Color> foreground_animation;
+    private volatile int foreground_animation_frame;
+    private volatile Color foreground_color = Color.black;
+
     private volatile Color background_color;
 
     public void crowdAnimate(Animation animation) {
@@ -150,6 +155,38 @@ public class LockstepView extends JComponent {
         }
     }
 
+    public static final List<Color> fade_in_sequence;
+    static {
+        fade_in_sequence = new ArrayList<>();
+        for (int i = 0; i < 16; i++) {
+            fade_in_sequence.add(0, new Color(0, 0, 0, i * (255 / 16)));
+        }
+        fade_in_sequence.set(0, Color.black);
+    }
+
+    private static final List<Color> fade_out_sequence;
+    static {
+        fade_out_sequence = new ArrayList<>();
+        for (int i = 0; i < 23; i++) {
+            fade_out_sequence.add(new Color(0, 0, 0, i * (255 / 23)));
+        }
+        fade_out_sequence.set(fade_out_sequence.size() - 1, Color.black);
+    }
+
+    public void fadeIn() {
+        synchronized (viewlock) {
+            this.foreground_animation = fade_in_sequence;
+            this.foreground_animation_frame = 0;
+        }
+    }
+
+    public void fadeOut() {
+        synchronized (viewlock) {
+            this.foreground_animation = fade_out_sequence;
+            this.foreground_animation_frame = 0;
+        }
+    }
+
     private void advanceFrame() {
         synchronized (viewlock) {
             if (next_size != null) {
@@ -168,6 +205,13 @@ public class LockstepView extends JComponent {
                 player_animation_frame++;
                 if (player_animation_frame >= player_animation.size()) {
                     player_animation = null;
+                }
+            }
+            if (foreground_animation != null) {
+                foreground_color = foreground_animation.get(foreground_animation_frame);
+                foreground_animation_frame++;
+                if (foreground_animation_frame >= foreground_animation.size()) {
+                    foreground_animation = null;
                 }
             }
         }
@@ -201,12 +245,20 @@ public class LockstepView extends JComponent {
                 offset = !offset;
             }
 
+            // draw zoom l4 stepswitchers as bach formation
             if (size == ZoomSize.l4 && (crowd_pose == StepswitcherPose.left_extend || crowd_pose == StepswitcherPose.left_pose)) {
                 // g.fillRect(0, 0, getWidth(), getHeight());
 
                 g.drawImage(bach_formation_left, (int)Math.round(screenx + 0 * scale), (int)Math.round(screeny * scale), (int)Math.round(bach_formation_left.getWidth(null) * scale), (int)Math.round(bach_formation_left.getHeight(null) * scale), null);
             } else if (size == ZoomSize.l4 && (crowd_pose == StepswitcherPose.right_extend || crowd_pose == StepswitcherPose.right_pose)) {
                 g.drawImage(bach_formation_right, (int)Math.round(screenx + 0 * scale), (int)Math.round(screeny * scale), (int)Math.round(bach_formation_right.getWidth(null) * scale), (int)Math.round(bach_formation_right.getHeight(null) * scale), null);
+            }
+
+
+            // stupid foreground thing for fade in/out
+            if (foreground_color != null) {
+                g.setColor(foreground_color);
+                g.fillRect(0, 0, getWidth(), getHeight());
             }
         }
     }

@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 
 import javax.swing.JFrame;
 
+import canaryprism.unlockstep.intro.IntroTitleCard;
 import canaryprism.unlockstep.swing.ColorPalette;
 
 public class Main {
@@ -116,11 +117,38 @@ public class Main {
                 default -> throw new RuntimeException("Invalid sprite path somehow: " + sprite_path);
             });
 
+
+        var intro_path = getArg(args, "--intro", 
+            (e) -> switch (e) {
+                case "lockstep1" -> "/unlockstep_assets/intro/lockstep1";
+                case "lockstep2" -> "/unlockstep_assets/intro/lockstep2";
+                case "skip" -> null;
+                default -> throw new IllegalArgumentException("Invalid intro: " + e);
+            }, 
+            () -> switch (game) {
+                case lockstep1 -> "/unlockstep_assets/intro/lockstep1";
+                case lockstep2 -> "/unlockstep_assets/intro/lockstep2";
+            });
+
+        var frame = new JFrame("Unlockstep");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        frame.setSize(200 * 3, 256 * 3);
+        if (intro_path != null) {
+            var intro = new IntroTitleCard(intro_path, frame);
+    
+            frame.setVisible(true);
+    
+            intro.start().join();
+    
+            frame.getContentPane().removeAll();
+        }
+
         var lockstep = switch (game) {
             case lockstep1 -> 
-                new Lockstep(new JFrame("Unlockstep"), music_path, "/unlockstep_assets/audio", sprite_path, color_palette);
+                new Lockstep(frame, music_path, "/unlockstep_assets/audio", sprite_path, color_palette);
             case lockstep2 -> 
-                new Lockstep2(new JFrame("Unlockstep"), music_path, "/unlockstep_assets/audio", sprite_path, color_palette);
+                new Lockstep2(frame, music_path, "/unlockstep_assets/audio", sprite_path, color_palette);
         };
 
         lockstep.start().join();
