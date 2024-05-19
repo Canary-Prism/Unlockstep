@@ -33,6 +33,7 @@ public class PlayerInputHandler {
 
             synchronized (ticklock) {
                 if (animation_sequence.get(i) == Animation.hitleft || animation_sequence.get(i) == Animation.hitright) {
+                    this.player_animation = animation_sequence.get(i);
                     if (animation_sequence.get(i) != last_animation) {
                         has_missed = false;
                         last_animation = animation_sequence.get(i);
@@ -80,13 +81,22 @@ public class PlayerInputHandler {
             synchronized (ticklock) {
                 if (animation_sequence.get(i) == Animation.hitleft || animation_sequence.get(i) == Animation.hitright) {
                     current_score = Scoring.miss;
+                    this.player_animation = switch (player_animation) {
+                        case hitleft -> Animation.missleft;
+                        case hitright -> Animation.missright;
+                        default -> player_animation;
+                    };
                     if (!has_tapped && !has_missed) {
                         missHit();
                         has_missed = true;
                     }
+                    this.player_animation = switch (player_animation) {
+                        case hitleft -> Animation.missright;
+                        case hitright -> Animation.missleft;
+                        default -> player_animation;
+                    };
                 }
                 has_tapped = false;
-                onbeat = !onbeat;
             }
         });
 
@@ -96,7 +106,8 @@ public class PlayerInputHandler {
         this.barely_end = Math.ceilDiv(barely_range, 2);
     }
 
-    private volatile boolean onbeat = true;
+    private volatile Animation player_animation = Animation.missleft;
+    // private volatile boolean onbeat = true;
     private volatile Scoring current_score = Scoring.miss;
 
     private final Object ticklock = new Object();
@@ -107,8 +118,8 @@ public class PlayerInputHandler {
 
     private void missHit() {
         synchronized (ticklock) {
-            lockstep.animatePlayer((onbeat) ? Animation.missleft : Animation.missright);
-            last_animation = (onbeat) ? Animation.hitleft : Animation.hitright;
+            lockstep.animatePlayer(player_animation);
+            last_animation = (player_animation == Animation.missleft) ? Animation.hitleft : Animation.hitright;
             lockstep.playSound(PlayerSound.miss);
         }
     }
@@ -123,43 +134,29 @@ public class PlayerInputHandler {
     public void playerInput() {
         synchronized (ticklock) {
             var score = this.current_score;
-            var onbeat = this.onbeat;
             if (has_tapped) 
                 return;
     
             has_tapped = true;
             
-            if (onbeat) {
-                switch (score) {
-                    case hit -> {
-                        has_missed = false;
-                        lockstep.animatePlayer(Animation.hitleft);
+
+            switch (score) {
+                case hit -> {
+                    has_missed = false;
+                    lockstep.animatePlayer(player_animation);
+                    if (player_animation == Animation.hitleft) {
                         lockstep.playSound(PlayerSound.onbeat);
-                    }
-                    case barely -> {
-                        has_missed = false;
-                        lockstep.animatePlayer(Animation.hitleft);
-                        lockstep.playSound(PlayerSound.barely);
-                    }
-                    case miss -> {
-                        missHit();
-                    }
-                }
-            } else {
-                switch (score) {
-                    case hit -> {
-                        has_missed = false;
-                        lockstep.animatePlayer(Animation.hitright);
+                    } else {
                         lockstep.playSound(PlayerSound.offbeat);
                     }
-                    case barely -> {
-                        has_missed = false;
-                        lockstep.animatePlayer(Animation.hitright);
-                        lockstep.playSound(PlayerSound.barely);
-                    }
-                    case miss -> {
-                        missHit();
-                    }
+                }
+                case barely -> {
+                    has_missed = false;
+                    lockstep.animatePlayer(player_animation);
+                    lockstep.playSound(PlayerSound.barely);
+                }
+                case miss -> {
+                    missHit();
                 }
             }
         }
