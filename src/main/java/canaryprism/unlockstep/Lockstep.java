@@ -331,7 +331,8 @@ public class Lockstep {
         return 1500 * 60 / 162;
     }
 
-    protected final Conductor conductor = new Conductor(60_000, getConductorBpm());
+    protected final Conductor audio_conductor = new Conductor(60_000, getConductorBpm());
+    protected final Conductor visuals_conductor = new Conductor(60_000, getConductorBpm());
     private final String sprite_path;
     private final JFrame frame;
     protected final ColorPalette color_palette;
@@ -340,13 +341,13 @@ public class Lockstep {
 
     private final Clip music;
 
-    public Lockstep(JFrame frame, String music_path, String audio_path, String sprite_path, ColorPalette color_palette) {
+    public Lockstep(JFrame frame, String music_path, String audio_path, String sprite_path, ColorPalette color_palette, boolean player_input_sound) {
         this.sprite_path = sprite_path;
         this.color_palette = color_palette;
 
         this.frame = frame;
 
-        this.input_handler = new PlayerInputHandler(this, 60_000, getConductorBpm(), animation_sequence, barely_range, hit_range);
+        this.input_handler = new PlayerInputHandler(this, 60_000, getConductorBpm(), animation_sequence, barely_range, hit_range, player_input_sound);
 
         try {
             this.music = AudioSystem.getClip();
@@ -380,6 +381,12 @@ public class Lockstep {
 
     private volatile CompletableFuture<Void> future = null;
 
+    private volatile long audio_delay = 0;
+
+    public void setAudioDelay(long delay) {
+        this.audio_delay = delay;
+    }
+
     public CompletableFuture<Void> start() {
         if (view != null) {
             return future;
@@ -388,7 +395,10 @@ public class Lockstep {
         view.setBackgroundColor(color_palette.getColor(ColorSequence.onbeat));
         frame.getContentPane().add(view);
 
+        
         setup();
+
+        view.requestFocus();
 
         var initial_delay = getInitialDelay();
 
@@ -405,8 +415,9 @@ public class Lockstep {
             @Override
             public void run() {
                 music.start();
-                conductor.start(initial_delay);
-                input_handler.start(initial_delay);
+                audio_conductor.start(initial_delay);
+                visuals_conductor.start(initial_delay + audio_delay);
+                input_handler.start(initial_delay + audio_delay);
             }
         }, 1500);
 
@@ -416,26 +427,28 @@ public class Lockstep {
 
         view.fadeIn();
 
+        view.requestFocus();
+
 
         this.future = new CompletableFuture<>();
         return this.future;
     }
 
     protected void setup() {
-        conductor.submit((e) -> {
+        audio_conductor.submit((e) -> {
             int i = e.beat();
 
             if (i >= sound_sequence.size()) {
-                conductor.stop();
+                audio_conductor.stop();
             }
             if (sound_sequence.get(i) != null)
                 sounds.get(sound_sequence.get(i)).play();
         });
-        conductor.submit((e) -> {
+        audio_conductor.submit((e) -> {
             int i = e.beat();
             var on = (i & 1) == 0;
             if (i >= rhythm_sequence.size()) {
-                conductor.stop();
+                audio_conductor.stop();
                 return;
             }
             if (rhythm_sequence.get(i) == Rhythm.on) {
@@ -447,15 +460,12 @@ public class Lockstep {
                     player_sounds.get(PlayerSound.offbeat).play();
                 }
             }
-            if (i + 4 == rhythm_sequence.size()) {
-                view.fadeOut();
-            }
         });
-        conductor.submit((e) -> {
+        visuals_conductor.submit((e) -> {
             int i = e.beat();
 
             if (i >= animation_sequence.size()) {
-                conductor.stop();
+                visuals_conductor.stop();
                 return;
             }
 
@@ -466,23 +476,26 @@ public class Lockstep {
                     view.crowdAnimate(animation_sequence.get(i));
             }
         });
-        conductor.submit((e) -> {
+        visuals_conductor.submit((e) -> {
             int i = e.beat();
 
             if (i >= color_sequence.size()) {
-                conductor.stop();
+                visuals_conductor.stop();
                 return;
             }
 
             if (color_sequence.get(i) != null) {
                 view.setBackgroundColor(color_palette.getColor(color_sequence.get(i)));
             }
+            if (i + 4 == rhythm_sequence.size()) {
+                view.fadeOut();
+            }
         });
-        conductor.submit((e) -> {
+        visuals_conductor.submit((e) -> {
             int i = e.beat();
 
             if (i >= size_sequence.size()) {
-                conductor.stop();
+                visuals_conductor.stop();
                 return;
             }
 
@@ -495,7 +508,8 @@ public class Lockstep {
         if (view == null) {
             return;
         }
-        conductor.stop();
+        audio_conductor.stop();
+        visuals_conductor.stop();
         frame.dispose();;
         view = null;
     }

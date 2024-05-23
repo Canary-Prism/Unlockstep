@@ -313,8 +313,8 @@ public class Lockstep2 extends Lockstep {
     }
 
 
-    public Lockstep2(JFrame frame, String music_path, String audio_path, String sprite_path, ColorPalette color_palette) {
-        super(frame, music_path, audio_path, sprite_path, color_palette);
+    public Lockstep2(JFrame frame, String music_path, String audio_path, String sprite_path, ColorPalette color_palette, boolean player_input_sound) {
+        super(frame, music_path, audio_path, sprite_path, color_palette, player_input_sound);
     }
 
     @Override
@@ -329,21 +329,22 @@ public class Lockstep2 extends Lockstep {
 
     @Override
     protected void setup() {
-        conductor.submit((e) -> {
+        audio_conductor.submit((e) -> {
             int i = e.beat();
 
             if (i >= sound_sequence.size()) {
-                conductor.stop();
+                audio_conductor.stop();
+                return;
             }
             if (sound_sequence.get(i) != null)
                 sounds.get(sound_sequence.get(i)).play();
         });
-        conductor.submit((e) -> {
+        audio_conductor.submit((e) -> {
             int i = e.beat();
             var on = (i % 3) == 0;
             var off = (i % 3) == 2;
             if (i >= rhythm_sequence.size()) {
-                conductor.stop();
+                audio_conductor.stop();
                 return;
             }
             if (rhythm_sequence.get(i) == Rhythm.on) {
@@ -355,15 +356,12 @@ public class Lockstep2 extends Lockstep {
                     player_sounds.get(PlayerSound.offbeat).play();
                 }
             }
-            if (i + 6 == rhythm_sequence.size()) {
-                view.fadeOut();
-            }
         });
-        conductor.submit((e) -> {
+        visuals_conductor.submit((e) -> {
             int i = e.beat();
 
             if (i >= animation_sequence.size()) {
-                conductor.stop();
+                visuals_conductor.stop();
                 return;
             }
 
@@ -373,12 +371,15 @@ public class Lockstep2 extends Lockstep {
                 else
                     view.crowdAnimate(animation_sequence.get(i));
             }
+            if (i + 6 == rhythm_sequence.size()) {
+                view.fadeOut();
+            }
         });
-        conductor.submit((e) -> {
+        visuals_conductor.submit((e) -> {
             int i = e.beat();
 
             if (i >= color_sequence.size()) {
-                conductor.stop();
+                visuals_conductor.stop();
                 return;
             }
 
@@ -386,11 +387,11 @@ public class Lockstep2 extends Lockstep {
                 view.setBackgroundColor(color_palette.getColor(color_sequence.get(i)));
             }
         });
-        conductor.submit((e) -> {
+        visuals_conductor.submit((e) -> {
             int i = e.beat();
 
             if (i >= size_sequence.size()) {
-                conductor.stop();
+                visuals_conductor.stop();
                 return;
             }
 

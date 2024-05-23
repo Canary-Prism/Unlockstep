@@ -5,6 +5,9 @@ import java.util.function.Supplier;
 
 import javax.swing.JFrame;
 
+import com.formdev.flatlaf.themes.FlatMacDarkLaf;
+
+import canaryprism.unlockstep.calibration.LagCalibration;
 import canaryprism.unlockstep.intro.IntroTitleCard;
 import canaryprism.unlockstep.swing.ColorPalette;
 
@@ -47,7 +50,10 @@ public class Main {
                 """);
     }
 
+
     public static void main(String[] args) {
+
+        FlatMacDarkLaf.setup();
 
         enum GameMode {
             lockstep1, lockstep2
@@ -130,8 +136,32 @@ public class Main {
                 case lockstep2 -> "/unlockstep_assets/intro/lockstep2";
             });
 
+        var audio_delay = getArg(args, "--audio-delay", Long::parseLong, () -> null);
         var frame = new JFrame("Unlockstep");
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        if (audio_delay == null) {
+            var calibration = new LagCalibration(frame, "/unlockstep_assets/audio",
+                    "/unlockstep_assets/music/practise.wav");
+            frame.pack();
+            frame.setVisible(true);
+
+            audio_delay = calibration.start().join();
+            System.out.println("Audio delay: " + audio_delay);
+            frame.getContentPane().removeAll();
+        }
+
+        final long audio_delay_final = audio_delay;
+
+        boolean player_input_sound = getArg(args, "--player-input-sound", (e) -> {
+            return switch (e) {
+                case "true" -> true;
+                case "false" -> false;
+                default -> throw new IllegalArgumentException("Invalid player input sound: " + e);
+            };
+        }, () -> audio_delay_final < 30);
+
 
         frame.setSize(200 * 3, 256 * 3);
         if (intro_path != null) {
@@ -146,10 +176,12 @@ public class Main {
 
         var lockstep = switch (game) {
             case lockstep1 -> 
-                new Lockstep(frame, music_path, "/unlockstep_assets/audio", sprite_path, color_palette);
+                new Lockstep(frame, music_path, "/unlockstep_assets/audio", sprite_path, color_palette, player_input_sound);
             case lockstep2 -> 
-                new Lockstep2(frame, music_path, "/unlockstep_assets/audio", sprite_path, color_palette);
+                new Lockstep2(frame, music_path, "/unlockstep_assets/audio", sprite_path, color_palette, player_input_sound);
         };
+
+        lockstep.setAudioDelay(audio_delay);
 
         lockstep.start().join();
         

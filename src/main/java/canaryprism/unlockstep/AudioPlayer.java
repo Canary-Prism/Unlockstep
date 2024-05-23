@@ -47,4 +47,10 @@ public class AudioPlayer {
         if (rotation == clips.length)
             rotation = 0;
     }
+
+    public void stop() {
+        for (var clip : clips) {
+            clip.stop();
+        }
+    }
 }

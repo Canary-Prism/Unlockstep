@@ -15,8 +15,13 @@ public class PlayerInputHandler {
 
     private final Lockstep lockstep;
 
-    public PlayerInputHandler(Lockstep lockstep, long millis, long beats, List<Animation> animation_sequence, long barely_range, long hit_range) {
+
+    private volatile boolean player_input_sound;
+
+    public PlayerInputHandler(Lockstep lockstep, long millis, long beats, List<Animation> animation_sequence, long barely_range, long hit_range, boolean player_input_sound) {
         this.lockstep = lockstep;
+
+        this.player_input_sound = player_input_sound;
 
         this.start_barely_conductor = new Conductor(millis, beats);
         this.start_hit_conductor = new Conductor(millis, beats);
@@ -154,10 +159,12 @@ public class PlayerInputHandler {
                 case hit -> {
                     has_missed = false;
                     lockstep.animatePlayer(player_animation);
-                    if (player_animation == Animation.hitleft) {
-                        lockstep.playSound(PlayerSound.onbeat);
-                    } else {
-                        lockstep.playSound(PlayerSound.offbeat);
+                    if (player_input_sound) {
+                        if (player_animation == Animation.hitleft) {
+                            lockstep.playSound(PlayerSound.onbeat);
+                        } else {
+                            lockstep.playSound(PlayerSound.offbeat);
+                        }
                     }
                 }
                 case barely -> {
