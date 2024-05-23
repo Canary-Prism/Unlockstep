@@ -6,9 +6,14 @@ to use:
 ```sh
 java -jar --enable-preview <the file>
 ```
-you can optionally specify `--game`, `--music`, `--sprite`, `--color`, and `--intro` to be either `lockstep1` or `lockstep2`  
-`--intro` can also be `skip` to skip the intro
-if you only specify some of them the rest will be determined by which makes most sense
+Command line options are available:
+- `--game` `--music` `--sprite` and `--color` must be either `lockstep1` or `lockstep2`
+- `--intro` (intro title card at start of game) can be `lockstep1` or `lockstep2` or `skip` which skips it
+- `--audio-delay` must be a `long` that is the amount of milliseconds it takes for your audio device to respond, having this argument skips the calibration step
+- `--player-input-sound` is either `true` or `false` and forces the game to either play or not play sound effects when you do a correct input, playing sound effects when audio delay is high may cause the sound effects to be desynced and confusing
+
+
+if you only specify some of them the rest will be determined automatically by which makes most sense
 
 ### [Download](https://github.com/Canary-Prism/Unlockstep/releases/)
 
@@ -31,6 +36,10 @@ This program uses Java 22 with preview features bc i'm weird like that
 
 
 ## Historical Changelog
+
+### 2.2.0
+- you no longer have to click the window with mouse first to be able to use keyboard inputs
+- new audio delay calibration thing to see how delayed ur audio thing is it also will account for input lag i guess
 
 ### 2.1.1
 - fixed bug now Lockstep 2 also fades to black at the end
