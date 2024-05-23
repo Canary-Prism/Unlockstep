@@ -12,6 +12,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
 import canaryprism.unlockstep.AudioPlayer;
 import canaryprism.unlockstep.Conductor;
@@ -41,13 +42,17 @@ public class LagCalibration {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
 
-        panel.add(new JLabel("""
+        var info_label = new JLabel("""
                 <html>
                 <h1>Audio Calibration</h1>
                 <p>Click the mouse or press space when you hear the cowbell</p>
                 <p>if the music is off, or the cowbells lagged at the start, wait till the music reloops</p>
                 </html>
-                """));
+                """);
+
+        info_label.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        panel.add(info_label);
 
         panel.add(audio_calibration);
 
@@ -165,6 +170,11 @@ public class LagCalibration {
 
         private void advanceFrame() {
             x_index += 1;
+
+            if (linger_timer > 0) {
+                linger_timer--;
+            }
+
         }
 
         private void verifyRecords() {
@@ -214,14 +224,21 @@ public class LagCalibration {
 
         private ArrayList<ClickRecord> click_records = new ArrayList<>();
 
+        private volatile int linger_timer = 0;
+        private volatile int linger_index = 0;
+
         public void playerInput() {
             var new_record = new ClickRecord(x_index, System.currentTimeMillis() - last_cowbell);
-            if (new_record.millis_offset > 150) {
+            if (new_record.millis_offset > 400) {
                 return;
             }
             synchronized (click_records) {
                 click_records.add(new_record);
             }
+
+            linger_timer = 10;
+            linger_index = x_index;
+
             if (remaining > 0) {
                 remaining--;
             }
@@ -231,16 +248,21 @@ public class LagCalibration {
         protected void paintComponent(java.awt.Graphics g) {
             var x = xpos(x_index);
 
-            g.setColor(new Color(100, 100, 255, 10));
+            g.setColor(new Color(100, 100, 255, 30));
 
             for (var record : click_records) {
                 var x2 = xpos(record.x_index);
                 g.fillRect(x2 - 10, 0, 20, 40);
             }
 
-            g.setColor(getForeground());
-
-            g.fillRect(x - 10, 0, 20, 40);
+            if (linger_timer > 0) {
+                var x2 = xpos(linger_index);
+                g.setColor(new Color(100, 100, 255));
+                g.fillRect(x2 - 10, 0, 20, 40);
+            } else {
+                g.setColor(getForeground());
+                g.fillRect(x - 10, 0, 20, 40);
+            } 
         }
 
         public void stop() {
