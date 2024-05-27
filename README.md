@@ -37,6 +37,10 @@ This program uses Java 22 with preview features bc i'm weird like that
 
 ## Historical Changelog
 
+### 2.2.2
+- fixed level 4 zoom not working properly 
+- Unlockstep is now fully window size independent
+
 ### 2.2.1
 - made the calibration thing look nicer
 - it now no longer pretends delay of more than 175 milliseconds doesn't exist :p
