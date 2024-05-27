@@ -9,7 +9,7 @@ public enum ZoomSize {
             case l1 -> 4;
             case l2 -> 0;
             case l3 -> -1;
-            case l4 -> -1;
+            case l4 -> -5;
             default -> -24;
         };
     }
@@ -20,7 +20,7 @@ public enum ZoomSize {
             case l1 -> 23;
             case l2 -> 21;
             case l3 -> 3;
-            case l4 -> 7;
+            case l4 -> 8;
             default -> 31;
         };
     }
@@ -108,7 +108,7 @@ public enum ZoomSize {
             case l1 -> 4;
             case l2 -> 6;
             case l3 -> 11;
-            case l4 -> 17;
+            case l4 -> 18;
             default -> 0;
         };
     }

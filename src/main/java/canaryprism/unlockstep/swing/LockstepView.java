@@ -239,7 +239,7 @@ public class LockstepView extends JComponent {
                 for (int x = size.startX() + (offset ? size.offsetX() : 0), xk = 0; xk < size.countX(); x += size.distX(), xk++) {
                     if (xk == size.playerX() && yk == size.playerY())
                         drawSprite(player_pose, player_sprite, g, x * scale + screenx, y * scale + screeny, scale);
-                    else
+                    else 
                         drawSprite(crowd_pose, crowd_sprite, g, x * scale + screenx, y * scale + screeny, scale);
                 }
                 offset = !offset;
@@ -249,9 +249,9 @@ public class LockstepView extends JComponent {
             if (size == ZoomSize.l4 && (crowd_pose == StepswitcherPose.left_extend || crowd_pose == StepswitcherPose.left_pose)) {
                 // g.fillRect(0, 0, getWidth(), getHeight());
 
-                g.drawImage(bach_formation_left, (int)Math.round(screenx + 0 * scale), (int)Math.round(screeny * scale), (int)Math.round(bach_formation_left.getWidth(null) * scale), (int)Math.round(bach_formation_left.getHeight(null) * scale), null);
+                g.drawImage(bach_formation_left, (int)Math.round(screenx), (int)Math.round(screeny), (int)Math.round(bach_formation_left.getWidth(null) * scale), (int)Math.round(bach_formation_left.getHeight(null) * scale), null);
             } else if (size == ZoomSize.l4 && (crowd_pose == StepswitcherPose.right_extend || crowd_pose == StepswitcherPose.right_pose)) {
-                g.drawImage(bach_formation_right, (int)Math.round(screenx + 0 * scale), (int)Math.round(screeny * scale), (int)Math.round(bach_formation_right.getWidth(null) * scale), (int)Math.round(bach_formation_right.getHeight(null) * scale), null);
+                g.drawImage(bach_formation_right, (int)Math.round(screenx), (int)Math.round(screeny), (int)Math.round(bach_formation_right.getWidth(null) * scale), (int)Math.round(bach_formation_right.getHeight(null) * scale), null);
             }
 
 
