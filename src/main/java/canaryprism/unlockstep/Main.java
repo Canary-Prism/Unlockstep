@@ -56,13 +56,14 @@ public class Main {
         FlatMacDarkLaf.setup();
 
         enum GameMode {
-            lockstep1, lockstep2
+            lockstep1, lockstep2, remix6
         }
 
         var game = getArg(args, "--game", (e) -> {
             return switch (e) {
                 case "lockstep1" -> GameMode.lockstep1;
                 case "lockstep2" -> GameMode.lockstep2;
+                case "remix6" -> GameMode.remix6;
                 default -> throw new IllegalArgumentException("Invalid game mode: " + e);
             };
         }, () -> GameMode.lockstep1);
@@ -81,23 +82,32 @@ public class Main {
                     
                     yield "/unlockstep_assets/music/lockstep2.wav";
                 }
+                case "remix6" -> {
+                    if (game != GameMode.remix6) 
+                        warnMusicMismatch(e, game.name());
+                    
+                    yield "/unlockstep_assets/music/remix6.wav";
+                }
                 default -> throw new IllegalArgumentException("Invalid music: " + e);
             }, 
             () -> switch (game) {
                 case lockstep1 -> "/unlockstep_assets/music/lockstep1.wav";
                 case lockstep2 -> "/unlockstep_assets/music/lockstep2.wav";
+                case remix6 -> "/unlockstep_assets/music/remix6.wav";
             });
 
         var sprite_path = getArg(args, "--sprite", 
             (e) -> switch (e) {
                 case "lockstep1" -> "/unlockstep_assets/sprites/lockstep1";
                 case "lockstep2" -> "/unlockstep_assets/sprites/lockstep2";
+                case "remix6" -> "/unlockstep_assets/sprites/remix6";
                 
                 default -> throw new IllegalArgumentException("Invalid sprites: " + e);
             }, 
             () -> switch (game) {
                 case lockstep1 -> "/unlockstep_assets/sprites/lockstep1";
                 case lockstep2 -> "/unlockstep_assets/sprites/lockstep2";
+                case remix6 -> "/unlockstep_assets/sprites/remix6";
             });
 
         var color_palette = getArg(args, "--color", 
@@ -114,12 +124,19 @@ public class Main {
                     
                     yield ColorPalette.lockstep2;
                 }
+                case "remix6" -> {
+                    if (game != GameMode.remix6) 
+                        warnColorMismatch(e, sprite_path);
+                    
+                    yield ColorPalette.remix6;
+                }
                 
                 default -> throw new IllegalArgumentException("Invalid color palette: " + e);
             }, 
             () -> switch (sprite_path) {
                 case "/unlockstep_assets/sprites/lockstep1" -> ColorPalette.lockstep1;
                 case "/unlockstep_assets/sprites/lockstep2" -> ColorPalette.lockstep2;
+                case "/unlockstep_assets/sprites/remix6" -> ColorPalette.remix6;
                 default -> throw new RuntimeException("Invalid sprite path somehow: " + sprite_path);
             });
 
@@ -134,6 +151,10 @@ public class Main {
             () -> switch (game) {
                 case lockstep1 -> "/unlockstep_assets/intro/lockstep1";
                 case lockstep2 -> "/unlockstep_assets/intro/lockstep2";
+                case remix6 -> {
+                    System.out.println("Warning: there is no intro for remix6");
+                    yield null;
+                }
             });
 
         var audio_delay = getArg(args, "--audio-delay", Long::parseLong, () -> null);
@@ -179,6 +200,8 @@ public class Main {
                 new Lockstep(frame, music_path, "/unlockstep_assets/audio", sprite_path, color_palette, player_input_sound);
             case lockstep2 -> 
                 new Lockstep2(frame, music_path, "/unlockstep_assets/audio", sprite_path, color_palette, player_input_sound);
+            case remix6 ->
+                new LockstepR6(frame, music_path, "/unlockstep_assets/audio", sprite_path, color_palette, player_input_sound);
         };
 
         lockstep.setAudioDelay(audio_delay);

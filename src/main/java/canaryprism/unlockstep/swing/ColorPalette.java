@@ -15,5 +15,11 @@ public interface ColorPalette {
         case offbeat -> new Color(0x1090c8);
     };
 
+    public static final ColorPalette remix6 = (e) -> switch (e) {
+        case onbeat -> new Color(0x88f820);
+        case offbeat -> new Color(0x60c008);
+    };
+
+
     Color getColor(ColorSequence sequence);
 }
