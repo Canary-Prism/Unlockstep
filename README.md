@@ -7,7 +7,7 @@ to use:
 java -jar --enable-preview <the file>
 ```
 Command line options are available:
-- `--game` `--music` `--sprite` and `--color` must be either `lockstep1` or `lockstep2`
+- `--game` `--music` `--sprite` and `--color` must be either `lockstep1`, `lockstep2`, or `remix6`
 - `--intro` (intro title card at start of game) can be `lockstep1` or `lockstep2` or `skip` which skips it
 - `--audio-delay` must be a `long` that is the amount of milliseconds it takes for your audio device to respond, having this argument skips the calibration step
 - `--player-input-sound` is either `true` or `false` and forces the game to either play or not play sound effects when you do a correct input, playing sound effects when audio delay is high may cause the sound effects to be desynced and confusing
@@ -36,6 +36,9 @@ This program uses Java 22 with preview features bc i'm weird like that
 
 
 ## Historical Changelog
+
+### 3.0.0
+- added lockstep remix 6
 
 ### 2.2.2
 - fixed level 4 zoom not working properly 
