@@ -257,7 +257,7 @@ public class Lockstep {
                     expanded.set(size - 1, ColorSequence.onbeat);
                     expanded.set(size - 3, ColorSequence.offbeat);
                     expanded.set(size - 5, ColorSequence.onbeat);
-                    expanded.set(size - 7, ColorSequence.onbeat);
+                    expanded.set(size - 7, ColorSequence.offbeat);
                 }
                 expanded.add(ColorSequence.offbeat);
                 for (int i = 1; i < r.beats(); i++) {
