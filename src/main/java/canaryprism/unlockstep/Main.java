@@ -145,16 +145,28 @@ public class Main {
             (e) -> switch (e) {
                 case "lockstep1" -> "/unlockstep_assets/intro/lockstep1";
                 case "lockstep2" -> "/unlockstep_assets/intro/lockstep2";
+                case "remix6" -> "/unlockstep_assets/intro/remix6";
                 case "skip" -> null;
                 default -> throw new IllegalArgumentException("Invalid intro: " + e);
             }, 
             () -> switch (game) {
                 case lockstep1 -> "/unlockstep_assets/intro/lockstep1";
                 case lockstep2 -> "/unlockstep_assets/intro/lockstep2";
-                case remix6 -> {
-                    System.out.println("Warning: there is no intro for remix6");
-                    yield null;
-                }
+                case remix6 -> "/unlockstep_assets/intro/remix6";
+            });
+
+        float intro_volume = getArg(args, "--intro", 
+            (e) -> switch (e) {
+                case "lockstep1" -> 2;
+                case "lockstep2" -> 2;
+                case "remix6" -> 1;
+                case "skip" -> 1;
+                default -> throw new IllegalArgumentException("Invalid intro: " + e);
+            }, 
+            () -> switch (game) {
+                case lockstep1 -> 2;
+                case lockstep2 -> 2;
+                case remix6 -> 1;
             });
 
         var audio_delay = getArg(args, "--audio-delay", Long::parseLong, () -> null);
@@ -186,7 +198,7 @@ public class Main {
 
         frame.setSize(200 * 3, 256 * 3);
         if (intro_path != null) {
-            var intro = new IntroTitleCard(intro_path, frame);
+            var intro = new IntroTitleCard(intro_path, frame, intro_volume);
     
             frame.setVisible(true);
     

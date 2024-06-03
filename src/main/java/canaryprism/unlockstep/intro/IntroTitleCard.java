@@ -31,15 +31,14 @@ public class IntroTitleCard {
 
     private MovingPicturesView title_view;
 
-    public IntroTitleCard(String path, JFrame frame) {
+    public IntroTitleCard(String path, JFrame frame, float volume) {
 
         try {
             music = AudioSystem.getClip();
             music.open(AudioSystem.getAudioInputStream(Lockstep.getResource(STR."\{path}/music.wav")));
 
-            // double the volume bc it's too quiet
             var control = (FloatControl)music.getControl(Type.MASTER_GAIN);
-            control.setValue(control.getMaximum());
+            control.setValue(20f * (float)Math.log10(volume));
 
             music.addLineListener((e) -> {
                 if (e.getType() == LineEvent.Type.STOP && future != null) {
