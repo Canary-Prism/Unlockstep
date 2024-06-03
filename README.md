@@ -37,6 +37,10 @@ This program uses Java 22 with preview features bc i'm weird like that
 
 ## Historical Changelog
 
+### 3.1.0
+- added intro for lockstep remix 6 (thanks Echo)
+- changed sprites for lockstep remix 6 (thanks Echo)
+
 ### 3.0.0
 - added lockstep remix 6
 
