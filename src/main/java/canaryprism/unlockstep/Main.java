@@ -2,6 +2,8 @@ package canaryprism.unlockstep;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JFrame;
 
@@ -50,13 +52,81 @@ public class Main {
                 """);
     }
 
+    static volatile int bpm = 120;
 
     public static void main(String[] args) {
+
+        // var cowbell = new AudioPlayer(Lockstep.getResource("/unlockstep_assets/audio/sfx/cowbell.wav"), 3);
+        // var music = new AudioPlayer(Lockstep.getResource("/unlockstep_assets/music/remix8.wav"), 1);
+
+        
+        // try {
+
+        //     var timer = new Timer();
+
+        //     var conductor = new Conductor(60_000_000, 171184);
+
+        //     final var first_change = 18 - 8;
+
+        //     conductor.submit((e) -> {
+        //         if (e.beat() == 143 - 32) {
+        //             System.out.println("Changing tempo");
+        //             conductor.setTempo(60_000, 172);
+        //         } else if (e.beat() == 143 + 8) {
+        //             System.out.println("Changing tempo");
+        //             conductor.setTempo(60_000_000, 171184);
+        //         } else if (e.beat() == first_change) {
+        //             System.out.println("Changing tempo");
+        //             conductor.setTempo(60_000, 182);
+        //         } else if (e.beat() == first_change + 4 * 6) {
+        //             System.out.println("Changing tempo");
+        //             conductor.setTempo(60_000, 185);
+        //         } else if (e.beat() == first_change + 4 * 6 + 4 * 2) {
+        //             System.out.println("Changing tempo");
+        //             conductor.setTempo(60_000, 190);
+        //         } else if (e.beat() == first_change + 4 * 6 + 4 * 2 + 4 * 2) {
+        //             System.out.println("Changing tempo");
+        //             conductor.setTempo(60_000, 198);
+        //         } else if (e.beat() == first_change + 4 * 6 + 4 * 2 + 4 * 2 + 4 * 2) {
+        //             System.out.println("Changing tempo");
+        //             conductor.setTempo(60_000, 213);
+        //         } else if (e.beat() == first_change + 4 * 6 + 4 * 2 + 4 * 2 + 4 * 2 + 4 * 2) {
+        //             System.out.println("Changing tempo");
+        //             conductor.setTempo(60_000, 216);
+        //         } else if (e.beat() == first_change + 4 * 6 + 4 * 2 + 4 * 2 + 4 * 2 + 4 * 2 + 4 * 2) {
+        //             System.out.println("Changing tempo");
+        //             conductor.setTempo(60_000, 218);
+        //         } else if (e.beat() == first_change + 4 * 6 + 4 * 2 + 4 * 2 + 4 * 2 + 4 * 2 + 4 * 2 + 4) {
+        //             System.out.println("Changing tempo");
+        //             conductor.setTempo(60_000, 220);
+        //         }
+        //     });
+
+        //     conductor.submit((e) -> {
+        //         cowbell.play();
+        //         System.out.println("cowbell " + e.beat());
+        //     });
+
+        //     conductor.start(0);
+
+
+        //     timer.schedule(new TimerTask() {
+        //         @Override
+        //         public void run() {
+        //             // music.play();
+        //         }
+        //     }, 60_000 / 171 - 80);
+
+
+        //     Thread.currentThread().join();
+        // } catch (Exception e) {
+        //     e.printStackTrace();
+        // }
 
         FlatMacDarkLaf.setup();
 
         enum GameMode {
-            lockstep1, lockstep2, remix6
+            lockstep1, lockstep2, remix6, remix8
         }
 
         var game = getArg(args, "--game", (e) -> {
@@ -64,6 +134,7 @@ public class Main {
                 case "lockstep1" -> GameMode.lockstep1;
                 case "lockstep2" -> GameMode.lockstep2;
                 case "remix6" -> GameMode.remix6;
+                case "remix8" -> GameMode.remix8;
                 default -> throw new IllegalArgumentException("Invalid game mode: " + e);
             };
         }, () -> GameMode.lockstep1);
@@ -88,12 +159,19 @@ public class Main {
                     
                     yield "/unlockstep_assets/music/remix6.wav";
                 }
+                case "remix8" -> {
+                    if (game != GameMode.remix8) 
+                        warnMusicMismatch(e, game.name());
+                    
+                    yield "/unlockstep_assets/music/remix8.wav";
+                }
                 default -> throw new IllegalArgumentException("Invalid music: " + e);
             }, 
             () -> switch (game) {
                 case lockstep1 -> "/unlockstep_assets/music/lockstep1.wav";
                 case lockstep2 -> "/unlockstep_assets/music/lockstep2.wav";
                 case remix6 -> "/unlockstep_assets/music/remix6.wav";
+                case remix8 -> "/unlockstep_assets/music/remix8.wav";
             });
 
         var sprite_path = getArg(args, "--sprite", 
@@ -101,6 +179,7 @@ public class Main {
                 case "lockstep1" -> "/unlockstep_assets/sprites/lockstep1";
                 case "lockstep2" -> "/unlockstep_assets/sprites/lockstep2";
                 case "remix6" -> "/unlockstep_assets/sprites/remix6";
+                case "remix8" -> "/unlockstep_assets/sprites/remix8";
                 
                 default -> throw new IllegalArgumentException("Invalid sprites: " + e);
             }, 
@@ -108,6 +187,7 @@ public class Main {
                 case lockstep1 -> "/unlockstep_assets/sprites/lockstep1";
                 case lockstep2 -> "/unlockstep_assets/sprites/lockstep2";
                 case remix6 -> "/unlockstep_assets/sprites/remix6";
+                case remix8 -> "/unlockstep_assets/sprites/remix8";
             });
 
         var color_palette = getArg(args, "--color", 
@@ -130,6 +210,13 @@ public class Main {
                     
                     yield ColorPalette.remix6;
                 }
+                case "remix8" -> {
+                    if (game != GameMode.remix8) 
+                        warnColorMismatch(e, sprite_path);
+                    
+                    yield ColorPalette.remix8;
+                }
+
                 
                 default -> throw new IllegalArgumentException("Invalid color palette: " + e);
             }, 
@@ -137,6 +224,7 @@ public class Main {
                 case "/unlockstep_assets/sprites/lockstep1" -> ColorPalette.lockstep1;
                 case "/unlockstep_assets/sprites/lockstep2" -> ColorPalette.lockstep2;
                 case "/unlockstep_assets/sprites/remix6" -> ColorPalette.remix6;
+                case "/unlockstep_assets/sprites/remix8" -> ColorPalette.remix8;
                 default -> throw new RuntimeException("Invalid sprite path somehow: " + sprite_path);
             });
 
@@ -146,6 +234,7 @@ public class Main {
                 case "lockstep1" -> "/unlockstep_assets/intro/lockstep1";
                 case "lockstep2" -> "/unlockstep_assets/intro/lockstep2";
                 case "remix6" -> "/unlockstep_assets/intro/remix6";
+                case "remix8" -> "/unlockstep_assets/intro/remix8";
                 case "skip" -> null;
                 default -> throw new IllegalArgumentException("Invalid intro: " + e);
             }, 
@@ -153,6 +242,7 @@ public class Main {
                 case lockstep1 -> "/unlockstep_assets/intro/lockstep1";
                 case lockstep2 -> "/unlockstep_assets/intro/lockstep2";
                 case remix6 -> "/unlockstep_assets/intro/remix6";
+                case remix8 -> "/unlockstep_assets/intro/remix8";
             });
 
         float intro_volume = getArg(args, "--intro", 
@@ -160,6 +250,7 @@ public class Main {
                 case "lockstep1" -> 2;
                 case "lockstep2" -> 2;
                 case "remix6" -> 1;
+                case "remix8" -> 1;
                 case "skip" -> 1;
                 default -> throw new IllegalArgumentException("Invalid intro: " + e);
             }, 
@@ -167,6 +258,7 @@ public class Main {
                 case lockstep1 -> 2;
                 case lockstep2 -> 2;
                 case remix6 -> 1;
+                case remix8 -> 1;
             });
 
         var audio_delay = getArg(args, "--audio-delay", Long::parseLong, () -> null);
@@ -193,7 +285,9 @@ public class Main {
                 case "false" -> false;
                 default -> throw new IllegalArgumentException("Invalid player input sound: " + e);
             };
-        }, () -> audio_delay_final < 30);
+        }, () -> false);
+
+        boolean auto = hasArg(args, "--auto");
 
 
         frame.setSize(200 * 3, 256 * 3);
@@ -214,7 +308,11 @@ public class Main {
                 new Lockstep2(frame, music_path, "/unlockstep_assets/audio", sprite_path, color_palette, player_input_sound);
             case remix6 ->
                 new LockstepR6(frame, music_path, "/unlockstep_assets/audio", sprite_path, color_palette, player_input_sound);
+            case remix8 ->
+                new LockstepR8(frame, music_path, "/unlockstep_assets/audio", sprite_path, color_palette, player_input_sound);
         };
+
+        lockstep.setAuto(auto);
 
         lockstep.setAudioDelay(audio_delay);
 

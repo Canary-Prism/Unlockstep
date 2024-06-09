@@ -337,7 +337,7 @@ public class Lockstep {
     private final JFrame frame;
     protected final ColorPalette color_palette;
 
-    private final PlayerInputHandler input_handler;
+    protected final PlayerInputHandler input_handler;
 
     private final Clip music;
 
@@ -372,6 +372,19 @@ public class Lockstep {
                 future.complete(null);
             }
         });
+
+        visuals_conductor.submit((e) -> {
+            int i = e.beat();
+
+            if (!auto || i >= animation_sequence.size()) {
+                return;
+            }
+
+            var animation = animation_sequence.get(i);
+            if (animation == Animation.hitleft || animation == Animation.hitright) {
+                playerTap();
+            }
+        });
     }
 
     protected final HashMap<Sound, AudioPlayer> sounds = new HashMap<>();
@@ -382,6 +395,12 @@ public class Lockstep {
     private volatile CompletableFuture<Void> future = null;
 
     private volatile long audio_delay = 0;
+
+    private volatile boolean auto = false;
+
+    public void setAuto(boolean auto) {
+        this.auto = auto;
+    }
 
     public void setAudioDelay(long delay) {
         this.audio_delay = delay;

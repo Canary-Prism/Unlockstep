@@ -106,6 +106,16 @@ public class PlayerInputHandler {
                 if (i + 1 >= animation_sequence.size()) {
                     this.running = false;
                 }
+
+                if (will_change) {
+
+                    start_barely_conductor.setTempo(change_millis, change_beats);
+                    start_hit_conductor.setTempo(change_millis, change_beats);
+                    end_hit_conductor.setTempo(change_millis, change_beats);
+                    end_barely_conductor.setTempo(change_millis, change_beats);
+
+                    will_change = false;
+                }
             }
         });
 
@@ -141,6 +151,24 @@ public class PlayerInputHandler {
         end_hit_conductor.start(initial_delay + hit_end);
         end_barely_conductor.start(initial_delay + barely_end);
         running = true;
+    }
+
+    private volatile boolean will_change = false;
+    private volatile long change_millis = 0, change_beats = 0;
+
+    public void setTempo(long millis, long beats) {
+        synchronized (ticklock) {
+            if (!running || current_score == Scoring.miss) {
+                start_barely_conductor.setTempo(millis, beats);
+                start_hit_conductor.setTempo(millis, beats);
+                end_hit_conductor.setTempo(millis, beats);
+                end_barely_conductor.setTempo(millis, beats);
+            } else {
+                will_change = true;
+                change_millis = millis;
+                change_beats = beats;
+            }
+        }
     }
 
     public void playerInput() {
