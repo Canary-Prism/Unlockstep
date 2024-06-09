@@ -11,6 +11,7 @@ Command line options are available:
 - `--intro` (intro title card at start of game) can be `lockstep1`, `lockstep2`, `remix6`, or `remix8` or `skip` which skips it
 - `--audio-delay` must be a `long` that is the amount of milliseconds it takes for your audio device to respond, having this argument skips the calibration step
 - `--player-input-sound` is either `true` or `false` and forces the game to either play or not play sound effects when you do a correct input, playing sound effects when audio delay is high may cause the sound effects to be desynced and confusing
+- `--auto` can be included which makes it such that the game plays itself
 
 
 if you only specify some of them the rest will be determined automatically by which makes most sense
