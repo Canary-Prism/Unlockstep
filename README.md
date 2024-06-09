@@ -2,6 +2,8 @@
 
 you know Lockstep? from Rhythm Heaven? this is that
 
+thanks to Squidguset for all the art for custom sprites :3
+
 to use: 
 ```sh
 java -jar --enable-preview <the file>
