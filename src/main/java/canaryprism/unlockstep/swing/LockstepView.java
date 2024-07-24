@@ -187,6 +187,32 @@ public class LockstepView extends JComponent {
         }
     }
 
+    private volatile Indicator indicator;
+    private volatile int indicator_frame = 0;
+    private volatile boolean indicator_trigger = false;
+    private volatile boolean indicator_fail = false;
+
+    public void setIndicator(Indicator indicator) {
+        synchronized (viewlock) {
+            this.indicator = indicator;
+        }
+    }
+
+    public void indicatorTrigger() {
+        synchronized (viewlock) {
+            if (!indicator_fail) {
+                this.indicator_frame = 0;
+                this.indicator_trigger = true;
+            }
+        }
+    }
+
+    public void indicatorFail() {
+        synchronized (viewlock) {
+            this.indicator_fail = true;
+        }
+    }
+
     private void advanceFrame() {
         synchronized (viewlock) {
             if (next_size != null) {
@@ -212,6 +238,13 @@ public class LockstepView extends JComponent {
                 foreground_animation_frame++;
                 if (foreground_animation_frame >= foreground_animation.size()) {
                     foreground_animation = null;
+                }
+            }
+            if (indicator != null && indicator_trigger && !indicator_fail) {
+                indicator_frame++;
+                if (indicator_frame >= indicator.frames().length) {
+                    indicator_frame = 0;
+                    indicator_trigger = false;
                 }
             }
         }
@@ -252,6 +285,17 @@ public class LockstepView extends JComponent {
                 g.drawImage(bach_formation_left, (int)Math.round(screenx), (int)Math.round(screeny), (int)Math.round(bach_formation_left.getWidth(null) * scale), (int)Math.round(bach_formation_left.getHeight(null) * scale), null);
             } else if (size == ZoomSize.l4 && (crowd_pose == StepswitcherPose.right_extend || crowd_pose == StepswitcherPose.right_pose)) {
                 g.drawImage(bach_formation_right, (int)Math.round(screenx), (int)Math.round(screeny), (int)Math.round(bach_formation_right.getWidth(null) * scale), (int)Math.round(bach_formation_right.getHeight(null) * scale), null);
+            }
+
+            // drawing indicator
+            if (indicator != null) {
+                final var indicator_width = 11.4;
+                final var indicator_height = 15.3;
+                if (indicator_fail) {
+                    g.drawImage(indicator.fail(), (int)Math.round(10), (int)Math.round(10), (int)Math.round(indicator_width * scale), (int)Math.round(indicator_height * scale), null);
+                } else {
+                    g.drawImage(indicator.frames()[indicator_frame], (int)Math.round(10), (int)Math.round(10), (int)Math.round(indicator_width * scale), (int)Math.round(indicator_height * scale), null);
+                }
             }
 
 

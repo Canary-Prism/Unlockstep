@@ -142,6 +142,7 @@ public class PlayerInputHandler {
             lockstep.animatePlayer(player_animation);
             last_animation = (player_animation == Animation.missleft) ? Animation.hitleft : Animation.hitright;
             lockstep.playSound(PlayerSound.miss);
+            lockstep.fail();
         }
     }
 
@@ -187,6 +188,7 @@ public class PlayerInputHandler {
                 case hit -> {
                     has_missed = false;
                     lockstep.animatePlayer(player_animation);
+                    lockstep.indicatorTrigger();
                     if (player_input_sound) {
                         if (player_animation == Animation.hitleft) {
                             lockstep.playSound(PlayerSound.onbeat);

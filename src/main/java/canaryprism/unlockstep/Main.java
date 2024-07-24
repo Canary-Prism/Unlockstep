@@ -2,9 +2,6 @@ package canaryprism.unlockstep;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import javax.swing.JFrame;
 
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
@@ -126,7 +123,7 @@ public class Main {
         FlatMacDarkLaf.setup();
 
         enum GameMode {
-            lockstep1, lockstep2, remix6, remix8
+            lockstep1, lockstep2, remix6, remix8, remix9
         }
 
         var game = getArg(args, "--game", (e) -> {
@@ -135,6 +132,7 @@ public class Main {
                 case "lockstep2" -> GameMode.lockstep2;
                 case "remix6" -> GameMode.remix6;
                 case "remix8" -> GameMode.remix8;
+                case "remix9" -> GameMode.remix9;
                 default -> throw new IllegalArgumentException("Invalid game mode: " + e);
             };
         }, () -> GameMode.lockstep1);
@@ -165,6 +163,12 @@ public class Main {
                     
                     yield "/unlockstep_assets/music/remix8.wav";
                 }
+                case "remix9" -> {
+                    if (game != GameMode.remix9) 
+                        warnMusicMismatch(e, game.name());
+                    
+                    yield "/unlockstep_assets/music/remix9.wav";
+                }
                 default -> throw new IllegalArgumentException("Invalid music: " + e);
             }, 
             () -> switch (game) {
@@ -172,6 +176,7 @@ public class Main {
                 case lockstep2 -> "/unlockstep_assets/music/lockstep2.wav";
                 case remix6 -> "/unlockstep_assets/music/remix6.wav";
                 case remix8 -> "/unlockstep_assets/music/remix8.wav";
+                case remix9 -> "/unlockstep_assets/music/remix9.wav";
             });
 
         var sprite_path = getArg(args, "--sprite", 
@@ -180,6 +185,7 @@ public class Main {
                 case "lockstep2" -> "/unlockstep_assets/sprites/lockstep2";
                 case "remix6" -> "/unlockstep_assets/sprites/remix6";
                 case "remix8" -> "/unlockstep_assets/sprites/remix8";
+                case "remix9" -> "/unlockstep_assets/sprites/remix9";
                 
                 default -> throw new IllegalArgumentException("Invalid sprites: " + e);
             }, 
@@ -188,6 +194,7 @@ public class Main {
                 case lockstep2 -> "/unlockstep_assets/sprites/lockstep2";
                 case remix6 -> "/unlockstep_assets/sprites/remix6";
                 case remix8 -> "/unlockstep_assets/sprites/remix8";
+                case remix9 -> "/unlockstep_assets/sprites/remix9"; 
             });
 
         var color_palette = getArg(args, "--color", 
@@ -216,6 +223,12 @@ public class Main {
                     
                     yield ColorPalette.remix8;
                 }
+                case "remix9" -> {
+                    if (game != GameMode.remix9) 
+                        warnColorMismatch(e, sprite_path);
+                    
+                    yield ColorPalette.remix9;
+                }
 
                 
                 default -> throw new IllegalArgumentException("Invalid color palette: " + e);
@@ -225,6 +238,7 @@ public class Main {
                 case "/unlockstep_assets/sprites/lockstep2" -> ColorPalette.lockstep2;
                 case "/unlockstep_assets/sprites/remix6" -> ColorPalette.remix6;
                 case "/unlockstep_assets/sprites/remix8" -> ColorPalette.remix8;
+                case "/unlockstep_assets/sprites/remix9" -> ColorPalette.remix9;
                 default -> throw new RuntimeException("Invalid sprite path somehow: " + sprite_path);
             });
 
@@ -235,6 +249,7 @@ public class Main {
                 case "lockstep2" -> "/unlockstep_assets/intro/lockstep2";
                 case "remix6" -> "/unlockstep_assets/intro/remix6";
                 case "remix8" -> "/unlockstep_assets/intro/remix8";
+                case "remix9" -> "/unlockstep_assets/intro/remix9";
                 case "skip" -> null;
                 default -> throw new IllegalArgumentException("Invalid intro: " + e);
             }, 
@@ -243,6 +258,7 @@ public class Main {
                 case lockstep2 -> "/unlockstep_assets/intro/lockstep2";
                 case remix6 -> "/unlockstep_assets/intro/remix6";
                 case remix8 -> "/unlockstep_assets/intro/remix8";
+                case remix9 -> "/unlockstep_assets/intro/remix9";
             });
 
         float intro_volume = getArg(args, "--intro", 
@@ -251,6 +267,7 @@ public class Main {
                 case "lockstep2" -> 2;
                 case "remix6" -> 1;
                 case "remix8" -> 1;
+                case "remix9" -> 1;
                 case "skip" -> 1;
                 default -> throw new IllegalArgumentException("Invalid intro: " + e);
             }, 
@@ -259,6 +276,7 @@ public class Main {
                 case lockstep2 -> 2;
                 case remix6 -> 1;
                 case remix8 -> 1;
+                case remix9 -> 1;
             });
 
         var audio_delay = getArg(args, "--audio-delay", Long::parseLong, () -> null);
@@ -277,7 +295,7 @@ public class Main {
             frame.getContentPane().removeAll();
         }
 
-        final long audio_delay_final = audio_delay;
+        // final long audio_delay_final = audio_delay;
 
         boolean player_input_sound = getArg(args, "--player-input-sound", (e) -> {
             return switch (e) {
@@ -288,6 +306,11 @@ public class Main {
         }, () -> false);
 
         boolean auto = hasArg(args, "--auto");
+        boolean perfect = hasArg(args, "--perfect");
+
+        if (auto && perfect) {
+            throw new IllegalArgumentException("Cannot have both auto and perfect mode");
+        }
 
 
         frame.setSize(200 * 3, 256 * 3);
@@ -310,9 +333,16 @@ public class Main {
                 new LockstepR6(frame, music_path, "/unlockstep_assets/audio", sprite_path, color_palette, player_input_sound);
             case remix8 ->
                 new LockstepR8(frame, music_path, "/unlockstep_assets/audio", sprite_path, color_palette, player_input_sound);
+            case remix9 ->
+                new LockstepR9(frame, music_path, "/unlockstep_assets/audio", sprite_path, color_palette, player_input_sound);
         };
 
         lockstep.setAuto(auto);
+        if (perfect) {
+            lockstep.loadIndicator("/unlockstep_assets/indicators/perfect");
+        } else if (auto) {
+            lockstep.loadIndicator("/unlockstep_assets/indicators/auto");
+        }
 
         lockstep.setAudioDelay(audio_delay);
 
