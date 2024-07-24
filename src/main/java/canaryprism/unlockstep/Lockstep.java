@@ -27,6 +27,7 @@ import canaryprism.unlockstep.swing.Animation;
 import canaryprism.unlockstep.swing.CollapsedZoomSize;
 import canaryprism.unlockstep.swing.ColorPalette;
 import canaryprism.unlockstep.swing.ColorSequence;
+import canaryprism.unlockstep.swing.Indicator;
 import canaryprism.unlockstep.swing.LockstepView;
 import canaryprism.unlockstep.swing.ZoomSize;
 
@@ -411,6 +412,7 @@ public class Lockstep {
             return future;
         }
         view = new LockstepView(60, this, sprite_path);
+        view.setIndicator(indicator);
         view.setBackgroundColor(color_palette.getColor(ColorSequence.onbeat));
         frame.getContentPane().add(view);
 
@@ -531,6 +533,34 @@ public class Lockstep {
         visuals_conductor.stop();
         frame.dispose();;
         view = null;
+    }
+
+    private volatile Indicator indicator = null;
+    private volatile boolean indicator_failed = false;
+
+    public void loadIndicator(String path) {
+        if (path == null) {
+            indicator = null;
+        } else {
+            indicator = Indicator.load(path);
+        }
+
+        if (view != null) {
+            view.setIndicator(indicator);
+        }
+    }
+
+    public void indicatorTrigger() {
+        view.indicatorTrigger();
+    }
+
+    public void fail() {
+        if (indicator == null || indicator_failed) {
+            return;
+        }
+        indicator_failed = true;
+        playSound(PlayerSound.perfectmiss);
+        view.indicatorFail();
     }
 
     public void playerTap() {
