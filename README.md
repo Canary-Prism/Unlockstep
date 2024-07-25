@@ -9,8 +9,8 @@ to use:
 java -jar --enable-preview <the file>
 ```
 Command line options are available:
-- `--game` `--music` `--sprite` and `--color` must be either `lockstep1`, `lockstep2`, `remix6`, or `remix8`
-- `--intro` (intro title card at start of game) can be `lockstep1`, `lockstep2`, `remix6`, or `remix8` or `skip` which skips it
+- `--game` `--music` `--sprite` and `--color` must be either `lockstep1`, `lockstep2`, `remix6`, `remix8`, or `remix9`
+- `--intro` (intro title card at start of game) can be `lockstep1`, `lockstep2`, `remix6`, `remix8`, or `remix9` or `skip` which skips it
 - `--audio-delay` must be a `long` that is the amount of milliseconds it takes for your audio device to respond, having this argument skips the calibration step
 - `--player-input-sound` is either `true` or `false` and forces the game to either play or not play sound effects when you do a correct input, playing sound effects when audio delay is high may cause the sound effects to be desynced and confusing
 - `--perfect` triggers the `perfect` indicator
