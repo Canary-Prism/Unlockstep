@@ -1,10 +1,14 @@
 package canaryprism.unlockstep.scoring;
 
-import java.util.List;
 import canaryprism.unlockstep.Conductor;
 import canaryprism.unlockstep.Lockstep;
 import canaryprism.unlockstep.sequence.PlayerSound;
 import canaryprism.unlockstep.swing.Animation;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.SequencedCollection;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class PlayerInputHandler {
     private final Conductor start_barely_conductor;
@@ -18,6 +22,9 @@ public class PlayerInputHandler {
 
     private volatile boolean player_input_sound;
 
+    // really don't like the need to use Optional here... feels kinda wasteful
+    private final ConcurrentLinkedQueue<Optional<Animation>> animation_queue = new ConcurrentLinkedQueue<>();
+
     public PlayerInputHandler(Lockstep lockstep, long millis, long beats, List<Animation> animation_sequence, long barely_range, long hit_range, boolean player_input_sound) {
         this.lockstep = lockstep;
 
@@ -28,20 +35,27 @@ public class PlayerInputHandler {
         this.end_hit_conductor = new Conductor(millis, beats);
         this.end_barely_conductor = new Conductor(millis, beats);
 
+        animation_queue.addAll(animation_sequence.stream().map(Optional::ofNullable).toList());
+
         start_barely_conductor.submit((e) -> {
             int i = e.beat();
 
-            if (i >= animation_sequence.size()) {
+            if (animation_queue.isEmpty()) {
                 start_barely_conductor.stop();
+                start_hit_conductor.stop();
+                end_hit_conductor.stop();
+                end_barely_conductor.stop();
                 return;
             }
 
+
             synchronized (ticklock) {
-                if (animation_sequence.get(i) == Animation.hitleft || animation_sequence.get(i) == Animation.hitright) {
-                    this.player_animation = animation_sequence.get(i);
-                    if (animation_sequence.get(i) != last_animation) {
+                var animation = animation_queue.element().orElse(null);
+                if (animation == Animation.hitleft || animation == Animation.hitright) {
+                    this.player_animation = animation;
+                    if (animation != last_animation) {
                         has_missed = false;
-                        last_animation = animation_sequence.get(i);
+                        last_animation = animation;
                     }
                     current_score = Scoring.barely;
                 }
@@ -56,7 +70,8 @@ public class PlayerInputHandler {
             }
 
             synchronized (ticklock) {
-                if (animation_sequence.get(i) == Animation.hitleft || animation_sequence.get(i) == Animation.hitright) {
+                var animation = animation_queue.element().orElse(null);
+                if (animation == Animation.hitleft || animation == Animation.hitright) {
                     current_score = Scoring.hit;
                 }
             }
@@ -70,7 +85,8 @@ public class PlayerInputHandler {
             }
 
             synchronized (ticklock) {
-                if (animation_sequence.get(i) == Animation.hitleft || animation_sequence.get(i) == Animation.hitright) {
+                var animation = animation_queue.element().orElse(null);
+                if (animation == Animation.hitleft || animation == Animation.hitright) {
                     current_score = Scoring.barely;
                 }
             }
@@ -84,7 +100,9 @@ public class PlayerInputHandler {
             }
 
             synchronized (ticklock) {
-                if (animation_sequence.get(i) == Animation.hitleft || animation_sequence.get(i) == Animation.hitright) {
+                var animation = animation_queue.remove().orElse(null); // this time we remove the element !!
+
+                if (animation == Animation.hitleft || animation == Animation.hitright) {
                     current_score = Scoring.miss;
                     this.player_animation = switch (player_animation) {
                         case hitleft -> Animation.missleft;
@@ -103,7 +121,7 @@ public class PlayerInputHandler {
                 }
                 has_tapped = false;
 
-                if (i + 1 >= animation_sequence.size()) {
+                if (animation_queue.isEmpty()) {
                     this.running = false;
                 }
 
@@ -178,6 +196,14 @@ public class PlayerInputHandler {
             change_millis = millis;
             change_beats = beats;
         }
+    }
+
+    public void loadNullable(SequencedCollection<? extends Animation> c) {
+        animation_queue.addAll(c.stream().map(Optional::<Animation>ofNullable).toList());
+    }
+
+    public void load(SequencedCollection<? extends Optional<Animation>> c) {
+        animation_queue.addAll(c);
     }
 
     public void playerInput() {
