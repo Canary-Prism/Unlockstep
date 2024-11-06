@@ -198,6 +198,10 @@ public class PlayerInputHandler {
         }
     }
 
+    public void load(Animation e) {
+        animation_queue.add(Optional.ofNullable(e));
+    }
+
     public void loadNullable(SequencedCollection<? extends Animation> c) {
         animation_queue.addAll(c.stream().map(Optional::<Animation>ofNullable).toList());
     }
