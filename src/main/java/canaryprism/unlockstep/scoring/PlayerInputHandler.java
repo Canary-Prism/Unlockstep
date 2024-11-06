@@ -172,6 +172,14 @@ public class PlayerInputHandler {
         }
     }
 
+    public void queueSetTempo(long millis, long beats) {
+        synchronized (ticklock) {
+            will_change = true;
+            change_millis = millis;
+            change_beats = beats;
+        }
+    }
+
     public void playerInput() {
         if (!running) {
             return;
