@@ -37,8 +37,7 @@ public class PlayerInputHandler {
 
         animation_queue.addAll(animation_sequence.stream().map(Optional::ofNullable).toList());
 
-        start_barely_conductor.submit((e) -> {
-            int i = e.beat();
+        start_barely_conductor.submit((_) -> {
 
             if (animation_queue.isEmpty()) {
                 start_barely_conductor.stop();
@@ -61,10 +60,9 @@ public class PlayerInputHandler {
                 }
             }
         });
-        start_hit_conductor.submit((e) -> {
-            int i = e.beat();
+        start_hit_conductor.submit((_) -> {
 
-            if (i >= animation_sequence.size()) {
+            if (animation_queue.isEmpty()) {
                 start_hit_conductor.stop();
                 return;
             }
@@ -76,10 +74,9 @@ public class PlayerInputHandler {
                 }
             }
         });
-        end_hit_conductor.submit((e) -> {
-            int i = e.beat();
+        end_hit_conductor.submit((_) -> {
 
-            if (i >= animation_sequence.size()) {
+            if (animation_queue.isEmpty()) {
                 end_hit_conductor.stop();
                 return;
             }
@@ -91,10 +88,9 @@ public class PlayerInputHandler {
                 }
             }
         });
-        end_barely_conductor.submit((e) -> {
-            int i = e.beat();
+        end_barely_conductor.submit((_) -> {
 
-            if (i >= animation_sequence.size()) {
+            if (animation_queue.isEmpty()) {
                 end_barely_conductor.stop();
                 return;
             }
