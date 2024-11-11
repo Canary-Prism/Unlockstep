@@ -8,6 +8,9 @@ to use:
 ```sh
 java -jar --enable-preview <the file>
 ```
+
+Since version v4.1.0 a GUI launcher is shown if no command line arguments are provided
+
 Command line options are available:
 - `--game` `--music` `--sprite` and `--color` must be either `lockstep1`, `lockstep2`, `remix6`, `remix8`, or `remix9`
 - `--intro` (intro title card at start of game) can be `lockstep1`, `lockstep2`, `remix6`, `remix8`, or `remix9` or `skip` which skips it
@@ -40,6 +43,10 @@ This program uses Java 22 with preview features bc i'm weird like that
 
 
 ## Historical Changelog
+
+### 4.1.0
+- added lockstep endless remix
+- added a GUI Launcher
 
 ### 4.0.0
 - added lockstep remix 9
