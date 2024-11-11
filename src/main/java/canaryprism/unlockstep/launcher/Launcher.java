@@ -35,7 +35,6 @@ public class Launcher extends JComponent {
 
         music_combobox.setRenderer(new DefaultListCellRenderer() {
             @Override
-            @SuppressWarnings("unchecked")
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 return super.getListCellRendererComponent(list, ((GameMode) value).name, index, isSelected, cellHasFocus);
             }
@@ -49,7 +48,6 @@ public class Launcher extends JComponent {
 
         sprite_combobox.setRenderer(new DefaultListCellRenderer() {
             @Override
-            @SuppressWarnings("unchecked")
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 return super.getListCellRendererComponent(list, ((GameMode) value).name, index, isSelected, cellHasFocus);
             }
@@ -64,7 +62,6 @@ public class Launcher extends JComponent {
 
         palette_combobox.setRenderer(new DefaultListCellRenderer() {
             @Override
-            @SuppressWarnings("unchecked")
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 return super.getListCellRendererComponent(list, ((GameMode) value).name, index, isSelected, cellHasFocus);
             }
@@ -78,7 +75,6 @@ public class Launcher extends JComponent {
 
         intro_combobox.setRenderer(new DefaultListCellRenderer() {
             @Override
-            @SuppressWarnings("unchecked")
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 return super.getListCellRendererComponent(list, ((GameMode) value).name, index, isSelected, cellHasFocus);
             }
@@ -119,7 +115,7 @@ public class Launcher extends JComponent {
         var delay_calibrate_button = new JButton("Calibrate");
         var delay_spinner = new JSpinner(new SpinnerNumberModel(0, 0, 2147483647, 10));
 
-        delay_calibrate_button.addActionListener((e) -> {
+        delay_calibrate_button.addActionListener((_) -> {
 
             var calibration_frame = new JFrame();
 
@@ -153,56 +149,34 @@ public class Launcher extends JComponent {
             intro_combobox.setSelectedItem(e.getItem());
         });
 
-        sprite_combobox.addItemListener((e) -> {
-            palette_combobox.setSelectedItem(e.getItem());
-        });
+        sprite_combobox.addItemListener((e) -> palette_combobox.setSelectedItem(e.getItem()));
 
         var start_button = new JButton("Start");
 
         this.add(Box.createGlue());
         this.add(start_button);
         
-        start_button.addActionListener((e) -> {
+        start_button.addActionListener((_) -> {
             frame.getContentPane().removeAll();
-            Thread.ofVirtual().start(() -> {
-                startGame(
-                        frame,
-                        ((GameMode) gamemode_combobox.getSelectedItem()),
-                        Main.music_paths.get(((GameMode) music_combobox.getSelectedItem())),
-                        Main.sprite_paths.get(((GameMode) sprite_combobox.getSelectedItem())),
-                        Main.color_palettes.get(((GameMode) palette_combobox.getSelectedItem())),
-                        false,
-                        auto_radio.isSelected(),
-                        perfect_radio.isSelected(),
-                        ((Number) delay_spinner.getValue()).longValue(),
-                        Main.intro_paths.get(((GameMode) intro_combobox.getSelectedItem())),
-                        Main.intro_volume.get(((GameMode) intro_combobox.getSelectedItem()))
-                );
-            });
+            Thread.ofVirtual().start(() -> startGame(
+                    frame,
+                    ((GameMode) gamemode_combobox.getSelectedItem()),
+                    Main.music_paths.get(((GameMode) music_combobox.getSelectedItem())),
+                    Main.sprite_paths.get(((GameMode) sprite_combobox.getSelectedItem())),
+                    Main.color_palettes.get(((GameMode) palette_combobox.getSelectedItem())),
+                    false,
+                    auto_radio.isSelected(),
+                    perfect_radio.isSelected(),
+                    ((Number) delay_spinner.getValue()).longValue(),
+                    Main.intro_paths.get(((GameMode) intro_combobox.getSelectedItem())),
+                    Main.intro_volume.get(((GameMode) intro_combobox.getSelectedItem()))
+            ));
         });
 
         makeCompactGrid(this, 8, 2, 5, 5, 5, 5);
 
-        var stream = new StreamOrWhatever<String>();
-
-        stream.map((e) -> {
-            return null;
-        });
-
-
     }
 
-    @FunctionalInterface
-    interface ThrowingFunction<T, R, E extends Throwable> {
-        R apply(T t) throws E;
-    }
-
-    class StreamOrWhatever<T> {
-        <R, E extends Throwable> StreamOrWhatever<R> map(ThrowingFunction<T, R, E> f) throws E {
-            f.apply(null);
-            return null;
-        }
-    }
 
     private static void startGame(JFrame frame, GameMode game, String music_path, String sprite_path, ColorPalette color_palette, boolean player_input_sound, boolean auto, boolean perfect, long audio_delay, String intro_path, float intro_volume) {
 
@@ -331,7 +305,7 @@ public class Launcher extends JComponent {
         pCons.setConstraint(SpringLayout.EAST, x);
     }
 
-    public static void main(String[] args) {
+    public static void main() {
         FlatMacDarkLaf.setup();
 
         var frame = new JFrame();

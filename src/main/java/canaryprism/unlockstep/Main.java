@@ -29,6 +29,7 @@ public class Main {
     static String getArg(String[] args, String key, Supplier<String> default_value) {
         return getArg(args, key, Function.identity(), default_value);
     }
+    @SuppressWarnings("unused")
     static String getArg(String[] args, String key) {
         return getArg(args, key, () -> { throw new IllegalArgumentException("No value for key " + key); });
     }
@@ -116,7 +117,7 @@ public class Main {
     public static void main(String[] args) {
 
         if (args.length == 0) {
-            Launcher.main(args);
+            Launcher.main();
 
             return;
         }
@@ -190,18 +191,16 @@ public class Main {
         FlatMacDarkLaf.setup();
 
 
-        var game = getArg(args, "--game", (e) -> {
-            return switch (e) {
-                case "lockstep1" -> GameMode.lockstep1;
-                case "lockstep2" -> GameMode.lockstep2;
-                case "remix6" -> GameMode.remix6;
-                case "remix8" -> GameMode.remix8;
-                case "remix9" -> GameMode.remix9;
-                case "remix1" -> GameMode.remix1;
-                case "endless_remix" -> GameMode.endless_remix;
-                case "wip1" -> GameMode.wip1;
-                default -> throw new IllegalArgumentException("Invalid game mode: " + e);
-            };
+        var game = getArg(args, "--game", (e) -> switch (e) {
+            case "lockstep1" -> GameMode.lockstep1;
+            case "lockstep2" -> GameMode.lockstep2;
+            case "remix6" -> GameMode.remix6;
+            case "remix8" -> GameMode.remix8;
+            case "remix9" -> GameMode.remix9;
+            case "remix1" -> GameMode.remix1;
+            case "endless_remix" -> GameMode.endless_remix;
+            case "wip1" -> GameMode.wip1;
+            default -> throw new IllegalArgumentException("Invalid game mode: " + e);
         }, () -> GameMode.lockstep1);
 
         var music_path = getArg(args, "--music", 
@@ -387,12 +386,10 @@ public class Main {
 
         // final long audio_delay_final = audio_delay;
 
-        boolean player_input_sound = getArg(args, "--player-input-sound", (e) -> {
-            return switch (e) {
-                case "true" -> true;
-                case "false" -> false;
-                default -> throw new IllegalArgumentException("Invalid player input sound: " + e);
-            };
+        boolean player_input_sound = getArg(args, "--player-input-sound", (e) -> switch (e) {
+            case "true" -> true;
+            case "false" -> false;
+            default -> throw new IllegalArgumentException("Invalid player input sound: " + e);
         }, () -> false);
 
         boolean auto = hasArg(args, "--auto");
